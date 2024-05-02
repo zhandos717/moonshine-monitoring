@@ -28,6 +28,9 @@ class MonitoringPage extends Page
 
     public function components(): array
     {
+
+
+
         return [
 
             Grid::make([

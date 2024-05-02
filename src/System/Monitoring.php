@@ -5,18 +5,18 @@ namespace Zhandos717\MoonshineMonitoring\System;
 class Monitoring
 {
 
-    public function cpu(): SystemResource|CPU
+    public function cpu(): SystemResource
     {
         return new CPU();
     }
 
-    public function memory(): SystemResource|Memory
+    public function memory(): SystemResource
     {
         return new Memory();
     }
 
 
-    public function disk():  SystemResource|Memory
+    public function disk(): SystemResource
     {
         return new Disk();
     }

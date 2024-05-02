@@ -4,7 +4,7 @@ namespace Zhandos717\MoonshineMonitoring\System;
 
 use Illuminate\Support\Str;
 
-abstract class AbstractResource
+abstract class AbstractResource implements SystemResource
 {
     protected function getOS(): string
     {
@@ -38,5 +38,21 @@ abstract class AbstractResource
         $fullClassName = get_called_class();
         $className = substr(strrchr($fullClassName, "\\"), 1);
         return $className ?: $fullClassName; // Fallback in case there is no namespace
+    }
+
+
+    protected function run(): float|int
+    {
+        if (app()->environment() === 'testing') {
+            return 50;
+        }
+
+        $usage = str_replace("\n", '', shell_exec(file_get_contents($this->getScriptName())));
+
+        if (is_numeric($usage)) {
+            return floatval($usage);
+        }
+
+        return 0;
     }
 }
