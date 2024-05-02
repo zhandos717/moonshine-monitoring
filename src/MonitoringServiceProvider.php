@@ -6,6 +6,7 @@ namespace Zhandos717\MoonshineMonitoring;
 use Illuminate\Support\ServiceProvider;
 use MoonShine\Menu\MenuItem;
 use MoonShine\MoonShine;
+use Zhandos717\MoonshineMonitoring\Commands\RecordCommand;
 use Zhandos717\MoonshineMonitoring\Pages\MonitoringPage;
 use Zhandos717\MoonshineMonitoring\System\Monitoring;
 
@@ -27,6 +28,7 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'moonshine-monitoring');
         $this->mergeConfigFrom(__DIR__ . '/../config/monitoring.php', 'moonshine.monitoring');
         $this->loadMigrations();
+        $this->registerCommands();
 
         moonshine()
             ->pages([
@@ -42,6 +44,15 @@ class MonitoringServiceProvider extends ServiceProvider
                     ),
                 ])
             );
+    }
+
+    private function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                RecordCommand::class,
+            ]);
+        }
     }
 
     private function loadMigrations()
