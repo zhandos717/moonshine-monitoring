@@ -28,7 +28,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Zhandos\\MoonshineMonitoring\\MonitoringServiceProvider"
+        "Zhandos717\\MoonshineMonitoring\\MonitoringServiceProvider"
       ]
     }
   }
