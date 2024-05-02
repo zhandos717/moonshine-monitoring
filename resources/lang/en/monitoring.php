@@ -16,4 +16,5 @@ return [
     'non_selected' => 'Non selected',
     'apply'        => 'Apply',
     'reset'        => 'Reset',
+    'monitoring'   => 'Monitoring',
 ];

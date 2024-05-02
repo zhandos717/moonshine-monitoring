@@ -17,4 +17,5 @@ return [
     'non_selected' => 'Не выбрано',
     'apply'        => 'Применить',
     'reset'        => 'Сбросить',
+    'monitoring'   => 'Мониторинг',
 ];
