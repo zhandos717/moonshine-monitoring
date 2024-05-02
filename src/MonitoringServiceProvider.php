@@ -26,7 +26,7 @@ class MonitoringServiceProvider extends ServiceProvider
                 fn(MoonShine $moonshine) => $moonshine->
                 vendorsMenu([
                     MenuItem::make(
-                        static fn() => __('Log viewer'),
+                        static fn() => __('moonshine-monitoring::monitoring.monitoring'),
                         new MonitoringPage(),
                     ),
                 ])
