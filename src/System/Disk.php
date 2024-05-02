@@ -2,7 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\System;
 
-class Disk implements SystemResource
+class Disk extends AbstractResource
 {
     public function usage(): mixed
     {
@@ -17,4 +17,7 @@ class Disk implements SystemResource
 
         return null;
     }
+
+
+
 }

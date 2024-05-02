@@ -5,8 +5,7 @@ namespace Zhandos717\MoonshineMonitoring\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
-use SaeedVaziry\Monitoring\Actions\CheckForAlerts;
-use SaeedVaziry\Monitoring\Actions\RecordUsage;
+use Zhandos717\MoonshineMonitoring\Actions\RecordUsage;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 
 class RecordCommand extends Command
@@ -26,16 +25,6 @@ class RecordCommand extends Command
     protected $description = 'Record resources usages';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
      * @return void
@@ -44,12 +33,10 @@ class RecordCommand extends Command
      */
     public function handle()
     {
-        tap(app(RecordUsage::class)->record([
+        app(RecordUsage::class)->record([
             'cpu'    => Monitoring::cpu()->usage(),
             'memory' => Monitoring::memory()->usage(),
             'disk'   => Monitoring::disk()->usage(),
-        ]), function ($record) {
-            app(CheckForAlerts::class)->check($record);
-        });
+        ]);
     }
 }

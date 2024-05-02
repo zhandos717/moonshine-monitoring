@@ -4,7 +4,7 @@ namespace Zhandos717\MoonshineMonitoring\Components;
 
 use Illuminate\Support\Str;
 use MoonShine\Components\MoonShineComponent;
-use Zhandos717\MoonshineMonitoring\System\Monitoring;
+use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 
 class MonitoringComponent extends MoonShineComponent
 {

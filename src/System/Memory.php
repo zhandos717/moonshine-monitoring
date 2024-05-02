@@ -2,7 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\System;
 
-class Memory implements SystemResource
+class Memory extends AbstractResource
 {
     /**
      * @return string|int|float|null

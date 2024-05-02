@@ -26,6 +26,7 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'moonshine-monitoring');
         $this->mergeConfigFrom(__DIR__ . '/../config/monitoring.php', 'moonshine.monitoring');
+        $this->loadMigrations();
 
         moonshine()
             ->pages([
@@ -41,5 +42,12 @@ class MonitoringServiceProvider extends ServiceProvider
                     ),
                 ])
             );
+    }
+
+    private function loadMigrations()
+    {
+        if (config('monitoring.migrations', true) && $this->app->runningInConsole()) {
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
+        }
     }
 }
