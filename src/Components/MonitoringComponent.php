@@ -20,9 +20,9 @@ class MonitoringComponent extends MoonShineComponent
 
         dd(
             [
-                'cpu'    => Monitoring::cpu()->usage(),
-                'memory' => Monitoring::memory()->usage(),
-                'disk'   => Monitoring::disk()->usage(),
+                'cpu'    => Monitoring::cpu()->getUsage(),
+                'memory' => Monitoring::memory()->getUsage(),
+                'disk'   => Monitoring::disk()->getUsage(),
             ]
         );
 
