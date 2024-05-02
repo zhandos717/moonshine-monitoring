@@ -1,9 +1,12 @@
 <?php
 
+namespace Zhandos717\MoonshineMonitoring;
+
+
 use Illuminate\Support\ServiceProvider;
 use MoonShine\Menu\MenuItem;
 use MoonShine\MoonShine;
-use Pages\MonitoringPage;
+use Zhandos717\MoonshineMonitoring\Pages\MonitoringPage;
 
 class MonitoringServiceProvider extends ServiceProvider
 {

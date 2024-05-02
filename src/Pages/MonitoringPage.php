@@ -1,6 +1,6 @@
 <?php
 
-namespace Pages;
+namespace Zhandos717\MoonshineMonitoring\Pages;
 
 use MoonShine\Attributes\Icon;
 use MoonShine\Pages\Page;

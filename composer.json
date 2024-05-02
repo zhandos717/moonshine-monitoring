@@ -1,35 +1,35 @@
 {
-    "name": "zhandos/moonshine-monitoring",
-    "description": "Server monitoring for MoonShine",
-    "keywords": [
-        "moonshine",
-        "monitoring",
-        "viewer"
-    ],
-    "type": "library",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Zhandos\\MoonshineMonitoring\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Zhandos",
-            "email": "zhandos.zhandarbekov@gmail.com",
-            "role": "Developer"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {
-        "php": "^8.1",
-        "moonshine/moonshine": "^2.9"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Zhandos\\MoonshineMonitoring\\MonitoringServiceProvider"
-            ]
-        }
+  "name": "zhandos717/moonshine-monitoring",
+  "description": "Server monitoring for MoonShine",
+  "keywords": [
+    "moonshine",
+    "monitoring",
+    "viewer"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Zhandos717\\MoonshineMonitoring\\": "src/"
     }
+  },
+  "authors": [
+    {
+      "name": "Zhandos",
+      "email": "zhandos.zhandarbekov@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^8.1",
+    "moonshine/moonshine": "^2.9"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Zhandos\\MoonshineMonitoring\\MonitoringServiceProvider"
+      ]
+    }
+  }
 }

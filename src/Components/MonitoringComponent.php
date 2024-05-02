@@ -1,6 +1,6 @@
 <?php
 
-namespace Components;
+namespace Zhandos717\MoonshineMonitoring\Components;
 
 use MoonShine\Components\MoonShineComponent;
 

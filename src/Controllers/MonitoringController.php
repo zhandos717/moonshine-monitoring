@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers;
+namespace Zhandos717\MoonshineMonitoring\Controllers;
 
 use Carbon\Carbon;
 use Exception;
