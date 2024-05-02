@@ -4,13 +4,14 @@ namespace Zhandos717\MoonshineMonitoring\Pages;
 
 use MoonShine\Attributes\Icon;
 use MoonShine\Pages\Page;
+use Zhandos717\MoonshineMonitoring\Components\MonitoringComponent;
 
-#[Icon('heroicons.outline.circle-stack')]
+#[Icon('heroicons.outline.cpu-chip')]
 class MonitoringPage extends Page
 {
     public function title(): string
     {
-        return __('Monitoring');
+        return __('moonshine-monitoring::monitoring.monitoring');
     }
 
     public function breadcrumbs(): array
@@ -22,6 +23,8 @@ class MonitoringPage extends Page
 
     public function components(): array
     {
-        // TODO: Implement components() method.
+        return [
+            MonitoringComponent::make(),
+        ];
     }
 }

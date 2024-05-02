@@ -8,5 +8,8 @@ Route::group([
     'as'         => 'moonshine.',
     'middleware' => [config('moonshine.auth.middleware'), 'web'],
 ], function () {
-    
+    Route::get('monitoring', [\Zhandos717\MoonshineMonitoring\Controllers\MonitoringController::class, 'index'])
+        ->name(
+            'monitoring.index'
+        );
 });
