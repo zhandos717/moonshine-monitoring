@@ -4,10 +4,7 @@ namespace Zhandos717\MoonshineMonitoring\System;
 
 class Disk implements SystemResource
 {
-    /**
-     * @return float|mixed
-     */
-    public function usage()
+    public function usage(): mixed
     {
         if (app()->environment() === 'testing') {
             return 50;
