@@ -5,9 +5,9 @@ namespace Zhandos717\MoonshineMonitoring\System;
 class Memory implements SystemResource
 {
     /**
-     * @return float|mixed
+     * @return string|int|float|null
      */
-    public function usage()
+    public function usage(): string|int|null|float
     {
         if (app()->environment() === 'testing') {
             return 50;

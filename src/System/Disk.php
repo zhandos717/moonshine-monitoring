@@ -2,7 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\System;
 
-class Disk
+class Disk implements SystemResource
 {
     /**
      * @return float|mixed
