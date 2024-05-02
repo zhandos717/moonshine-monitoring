@@ -1,0 +1,20 @@
+<?php
+
+namespace Components;
+
+use MoonShine\Components\MoonShineComponent;
+
+class MonitoringComponent extends MoonShineComponent
+{
+    protected string $view = 'moonshine-log-viewer::default';
+
+    public function __construct()
+    {
+        //
+    }
+
+    protected function viewData(): array
+    {
+        return [];
+    }
+}
