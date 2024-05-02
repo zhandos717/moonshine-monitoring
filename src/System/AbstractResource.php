@@ -8,11 +8,35 @@ abstract class AbstractResource
 {
     protected function getOS(): string
     {
-        return Str::of(PHP_OS)->lower()->value();
+        return strtolower(PHP_OS);
     }
 
     protected function getScriptName(): string
     {
-        return sprintf('%s/../../scripts/%s/%s.sh', __DIR__, $this->getOS(), Str::of(get_class($this))->lower()->value());
+        $scriptDirectory = $this->resolveScriptDirectory();
+        $scriptFileName = $this->resolveScriptFileName();
+
+        return sprintf('%s%s%s.sh', $scriptDirectory, DIRECTORY_SEPARATOR, $scriptFileName);
+    }
+
+    private function resolveScriptDirectory(): string
+    {
+        return realpath(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . $this->getOS(
+            )
+        );
+    }
+
+    private function resolveScriptFileName(): string
+    {
+        $className = $this->getSimpleClassName();
+        return strtolower($className);
+    }
+
+    private function getSimpleClassName(): string
+    {
+        $fullClassName = get_called_class();
+        $className = substr(strrchr($fullClassName, "\\"), 1);
+        return $className ?: $fullClassName; // Fallback in case there is no namespace
     }
 }

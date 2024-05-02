@@ -17,9 +17,5 @@ class CPU extends AbstractResource
 
         return null;
     }
-
-    protected function getScriptName(): string
-    {
-        return sprintf('%s/../../scripts/%s/cpu.sh', __DIR__, $this->getOS());
-    }
+    
 }
