@@ -12,7 +12,7 @@ use Zhandos717\MoonshineMonitoring\Components\MonitoringComponent;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
-#[Icon('heroicons.outline.cpu-chip')]
+#[Icon('s.cpu-chip')]
 class MonitoringPage extends Page
 {
     public function getTitle(): string
