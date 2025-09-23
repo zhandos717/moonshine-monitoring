@@ -260,8 +260,8 @@ Contributions are welcome! Here's how you can help:
 
 ## Requirements
 
-- PHP 8.1 or higher
-- Laravel 8.0 or higher
+- PHP 8.2 or higher
+- Laravel 10.0 or higher
 - MoonShine 3.0 or higher
 
 ## License
