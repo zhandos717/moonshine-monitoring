@@ -46,7 +46,7 @@ class MonitoringServiceProvider extends ServiceProvider
         if (config('moonshine.monitoring.auto_menu')) {
             $menu->add([
                 MenuItem::make(
-                    __('Log viewer'),
+                    __('moonshine-monitoring::ui.monitoring'),
                     MonitoringPage::class,
                 ),
             ]);

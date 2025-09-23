@@ -17,13 +17,13 @@ class MonitoringPage extends Page
 {
     public function getTitle(): string
     {
-        return  $this->title ?: __('moonshine-monitoring::monitoring.monitoring');
+        return $this->title ?: __('moonshine-monitoring::ui.monitoring');
     }
 
     public function getBreadcrumbs(): array
     {
         return [
-            '#' => $this->getTitle()
+            '#' => $this->getTitle(),
         ];
     }
 
@@ -32,13 +32,13 @@ class MonitoringPage extends Page
     {
         // Get historical data for charts
         $records = MonitoringRecord::orderBy('created_at', 'desc')->limit(30)->get();
-        
+
         // Prepare chart data
         $cpuData = [];
         $memoryData = [];
         $diskData = [];
         $labels = [];
-        
+
         foreach ($records->reverse() as $record) {
             $labels[] = $record->created_at->format('H:i');
             $cpuData[] = $record->cpu;
@@ -51,37 +51,37 @@ class MonitoringPage extends Page
                 Column::make([
                     ValueMetric::make('Disk Usage')
                         ->value(Monitoring::disk()->getUsage())
-                        ->progress(Monitoring::disk()->getTotal())
+                        ->progress(Monitoring::disk()->getTotal()),
                 ])->columnSpan(4),
 
                 Column::make([
                     ValueMetric::make('CPU Usage')
                         ->value(Monitoring::cpu()->getUsage())
-                        ->progress(Monitoring::cpu()->getTotal())
+                        ->progress(Monitoring::cpu()->getTotal()),
                 ])->columnSpan(4),
 
                 Column::make([
                     ValueMetric::make('Memory Usage')
                         ->value(Monitoring::memory()->getUsage())
-                        ->progress(Monitoring::memory()->getTotal())
+                        ->progress(Monitoring::memory()->getTotal()),
                 ])->columnSpan(4),
 
                 Column::make([
                     LineChartMetric::make('CPU Usage History')
                         ->line([
-                            'CPU %' => array_combine($labels, $cpuData)
-                        ])
+                            'CPU %' => array_combine($labels, $cpuData),
+                        ]),
                 ])->columnSpan(6),
-                
+
                 Column::make([
                     LineChartMetric::make('Memory Usage History')
                         ->line([
-                            'Memory %' => array_combine($labels, $memoryData)
-                        ])
+                            'Memory %' => array_combine($labels, $memoryData),
+                        ]),
                 ])->columnSpan(6),
             ]),
-            
-            MonitoringComponent::make()
+
+            MonitoringComponent::make(),
         ];
     }
 }

@@ -3,8 +3,8 @@
 namespace Zhandos717\MoonshineMonitoring\Controllers;
 
 use Exception;
-use MoonShine\Http\Controllers\MoonShineController;
-use MoonShine\MoonShineRequest;
+use MoonShine\Laravel\Http\Controllers\MoonShineController;
+use MoonShine\Laravel\MoonShineRequest;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 class MonitoringController extends MoonShineController
