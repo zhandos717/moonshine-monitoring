@@ -3,7 +3,6 @@
 namespace Zhandos717\MoonshineMonitoring\Pages;
 
 use MoonShine\Attributes\Icon;
-use MoonShine\Decorations\Divider;
 use MoonShine\Decorations\Grid;
 use MoonShine\Metrics\LineChartMetric;
 use MoonShine\Metrics\ValueMetric;
@@ -11,6 +10,7 @@ use MoonShine\Pages\Page;
 use Zhandos717\MoonshineMonitoring\Components\MonitoringComponent;
 use MoonShine\Decorations\Column;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
+use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 #[Icon('heroicons.outline.cpu-chip')]
 class MonitoringPage extends Page
@@ -29,45 +29,58 @@ class MonitoringPage extends Page
 
     public function components(): array
     {
+        // Get historical data for charts
+        $records = MonitoringRecord::orderBy('created_at', 'desc')->limit(30)->get();
+        
+        // Prepare chart data
+        $cpuData = [];
+        $memoryData = [];
+        $diskData = [];
+        $labels = [];
+        
+        foreach ($records->reverse() as $record) {
+            $labels[] = $record->created_at->format('H:i');
+            $cpuData[] = $record->cpu;
+            $memoryData[] = $record->memory;
+            $diskData[] = $record->disk;
+        }
+
         return [
-
             Grid::make([
-
                 Column::make([
-                    ValueMetric::make(__('moonshine-monitoring::monitoring.monitoring'))
+                    ValueMetric::make('Disk Usage')
                         ->value(Monitoring::disk()->getUsage())
                         ->progress(Monitoring::disk()->getTotal())
                 ])->columnSpan(4),
 
                 Column::make([
-                    ValueMetric::make(__('moonshine-monitoring::monitoring.monitoring'))
+                    ValueMetric::make('CPU Usage')
                         ->value(Monitoring::cpu()->getUsage())
                         ->progress(Monitoring::cpu()->getTotal())
                 ])->columnSpan(4),
 
                 Column::make([
-                    ValueMetric::make(__('moonshine-monitoring::monitoring.monitoring'))
+                    ValueMetric::make('Memory Usage')
                         ->value(Monitoring::memory()->getUsage())
                         ->progress(Monitoring::memory()->getTotal())
                 ])->columnSpan(4),
 
-//                LineChartMetric::make('Articles')
-//                    ->line([
-//                        'Count' => [
-//                            now()->subDays()->format('Y-m-d') => 010,
-//                            now()->format('Y-m-d')            => 010
-//                        ]
-//                    ])
-//                    ->columnSpan(6),
-//                LineChartMetric::make('Comments')
-//                    ->line([
-//                        'Count' => [
-//                            now()->subDays()->format('Y-m-d') => 10,
-//                            now()->format('Y-m-d')            => 10
-//                        ]
-//                    ])
-//                    ->columnSpan(6)
-            ])
+                Column::make([
+                    LineChartMetric::make('CPU Usage History')
+                        ->line([
+                            'CPU %' => array_combine($labels, $cpuData)
+                        ])
+                ])->columnSpan(6),
+                
+                Column::make([
+                    LineChartMetric::make('Memory Usage History')
+                        ->line([
+                            'Memory %' => array_combine($labels, $memoryData)
+                        ])
+                ])->columnSpan(6),
+            ]),
+            
+            MonitoringComponent::make()
         ];
     }
 }

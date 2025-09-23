@@ -30,20 +30,20 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->loadMigrations();
         $this->registerCommands();
 
-        moonshine()
-            ->pages([
-                new MonitoringPage(),
-            ])
-            ->when(
-                config('moonshine.monitoring.auto_menu'),
-                fn(MoonShine $moonshine) => $moonshine->
-                vendorsMenu([
-                    MenuItem::make(
-                        static fn() => __('moonshine-monitoring::monitoring.monitoring'),
-                        new MonitoringPage(),
-                    ),
-                ])
-            );
+        // Register the monitoring page
+        moonshine()->pages([
+            new MonitoringPage(),
+        ]);
+        
+        // Add to menu if enabled
+        if (config('moonshine.monitoring.auto_menu', true)) {
+            moonshine()->vendorsMenu([
+                MenuItem::make(
+                    static fn() => __('moonshine-monitoring::monitoring.monitoring'),
+                    new MonitoringPage(),
+                ),
+            ]);
+        }
     }
 
     private function registerCommands()

@@ -20,35 +20,6 @@ abstract class AbstractResource implements SystemResource
         return strtolower(PHP_OS);
     }
 
-    protected function getScriptName(): string
-    {
-        $scriptDirectory = $this->resolveScriptDirectory();
-        $scriptFileName = $this->resolveScriptFileName();
-
-        return sprintf('%s%s%s.sh', $scriptDirectory, DIRECTORY_SEPARATOR, $scriptFileName);
-    }
-
-    private function resolveScriptDirectory(): string
-    {
-        return realpath(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'scripts' . DIRECTORY_SEPARATOR . $this->getOS(
-            )
-        );
-    }
-
-    private function resolveScriptFileName(): string
-    {
-        $className = $this->getSimpleClassName();
-        return strtolower($className);
-    }
-
-    private function getSimpleClassName(): string
-    {
-        $fullClassName = get_called_class();
-        $className = substr(strrchr($fullClassName, "\\"), 1);
-        return $className ?: $fullClassName; // Fallback in case there is no namespace
-    }
-
     public function setUsage(?float $usage): SystemResource
     {
         $this->usage = $usage;
@@ -80,20 +51,8 @@ abstract class AbstractResource implements SystemResource
             $this->setTotal(100);
             $this->setUsage(50);
         }
-
-        $usage = str_replace("\n", '', shell_exec(file_get_contents($this->getScriptName())));
-
-
-        if (is_numeric($usage)) {
-            $this->setTotal(100);
-            $this->setUsage($usage);
-            return;
-        }
-
-        $result = json_decode($usage, true);
-        if (is_array($result)) {
-            $this->setTotal($result['total'] ?? null);
-            $this->setUsage($result['used'] ?? null);
-        }
+        
+        // Каждый конкретный ресурс должен реализовать свою логику в run()
+        // Этот метод остается для обратной совместимости
     }
 }

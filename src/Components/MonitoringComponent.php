@@ -2,9 +2,9 @@
 
 namespace Zhandos717\MoonshineMonitoring\Components;
 
-use Illuminate\Support\Str;
 use MoonShine\Components\MoonShineComponent;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
+use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 class MonitoringComponent extends MoonShineComponent
 {
@@ -14,19 +14,21 @@ class MonitoringComponent extends MoonShineComponent
     {
     }
 
-    protected function viewData(): array
+    public function viewData(): array
     {
-        $viewer = Str::of(PHP_OS)->lower();
+        // Get current resource usage
+        $cpu = Monitoring::cpu()->getUsage();
+        $memory = Monitoring::memory()->getUsage();
+        $disk = Monitoring::disk()->getUsage();
+        
+        // Get historical data for charts
+        $records = MonitoringRecord::orderBy('created_at', 'desc')->limit(20)->get();
 
-        dd(
-            [
-                'cpu'    => Monitoring::cpu()->getUsage(),
-                'memory' => Monitoring::memory()->getUsage(),
-                'disk'   => Monitoring::disk()->getUsage(),
-            ]
-        );
-
-
-        return [];
+        return [
+            'cpu' => $cpu,
+            'memory' => $memory,
+            'disk' => $disk,
+            'records' => $records
+        ];
     }
 }
