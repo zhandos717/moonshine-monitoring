@@ -2,30 +2,31 @@
 
 namespace Zhandos717\MoonshineMonitoring\Pages;
 
-use MoonShine\Attributes\Icon;
-use MoonShine\Decorations\Grid;
-use MoonShine\Metrics\LineChartMetric;
-use MoonShine\Metrics\ValueMetric;
-use MoonShine\Pages\Page;
+use MoonShine\Apexcharts\Components\LineChartMetric;
+use MoonShine\Laravel\Pages\Page;
+use MoonShine\Support\Attributes\Icon;
+use MoonShine\UI\Components\Layout\Column;
+use MoonShine\UI\Components\Layout\Grid;
+use MoonShine\UI\Components\Metrics\Wrapped\ValueMetric;
 use Zhandos717\MoonshineMonitoring\Components\MonitoringComponent;
-use MoonShine\Decorations\Column;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 #[Icon('heroicons.outline.cpu-chip')]
 class MonitoringPage extends Page
 {
-    public function title(): string
+    public function getTitle(): string
     {
-        return __('moonshine-monitoring::monitoring.monitoring');
+        return  $this->title ?: __('moonshine-monitoring::monitoring.monitoring');
     }
 
-    public function breadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         return [
-            '#' => $this->title(),
+            '#' => $this->getTitle()
         ];
     }
+
 
     public function components(): array
     {
