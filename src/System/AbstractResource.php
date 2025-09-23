@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 abstract class AbstractResource implements SystemResource
 {
 
-    protected ?int $total;
-    protected ?float $usage;
+    protected ?int $total = null;
+    protected ?float $usage = null;
 
     public function __construct()
     {
