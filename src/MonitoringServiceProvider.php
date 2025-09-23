@@ -41,9 +41,7 @@ class MonitoringServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
-        $core->pages([
-                MonitoringPage::class,
-            ]);
+        $core->pages([MonitoringPage::class]);
 
         if (config('moonshine.monitoring.auto_menu')) {
             $menu->add([
