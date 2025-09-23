@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.3] - 2025-09-23
+
+### Fixed
+- Fixed "Typed property must not be accessed before initialization" error in AbstractResource
+- Initialized $usage and $total properties with null values by default
+
 ## [1.1.2] - 2025-09-23
 
 ### Added
