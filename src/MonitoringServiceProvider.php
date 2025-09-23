@@ -4,49 +4,26 @@ namespace Zhandos717\MoonshineMonitoring;
 
 
 use Illuminate\Support\ServiceProvider;
-use MoonShine\Menu\MenuItem;
-use MoonShine\MoonShine;
 use Zhandos717\MoonshineMonitoring\Commands\RecordCommand;
 use Zhandos717\MoonshineMonitoring\Pages\MonitoringPage;
 use Zhandos717\MoonshineMonitoring\System\Monitoring;
+
+use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
+use MoonShine\Contracts\MenuManager\MenuManagerContract;
+use MoonShine\MenuManager\MenuItem;
+
 
 class MonitoringServiceProvider extends ServiceProvider
 {
 
     public function register(): void
     {
-        // facade
         $this->app->bind('monitoring', function () {
             return new Monitoring();
         });
     }
 
-    public function boot(): void
-    {
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'moonshine-monitoring');
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'moonshine-monitoring');
-        $this->mergeConfigFrom(__DIR__ . '/../config/monitoring.php', 'moonshine.monitoring');
-        $this->loadMigrations();
-        $this->registerCommands();
-
-        // Register the monitoring page
-        moonshine()->pages([
-            new MonitoringPage(),
-        ]);
-        
-        // Add to menu if enabled
-        if (config('moonshine.monitoring.auto_menu', true)) {
-            moonshine()->vendorsMenu([
-                MenuItem::make(
-                    static fn() => __('moonshine-monitoring::monitoring.monitoring'),
-                    new MonitoringPage(),
-                ),
-            ]);
-        }
-    }
-
-    private function registerCommands()
+    private function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -55,10 +32,26 @@ class MonitoringServiceProvider extends ServiceProvider
         }
     }
 
-    private function loadMigrations()
+    public function boot(CoreContract $core, MenuManagerContract $menu): void
     {
-        if (config('monitoring.migrations', true) && $this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'moonshine-monitoring');
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'moonshine-monitoring');
+        $this->mergeConfigFrom(__DIR__.'/../config/monitoring.php', 'moonshine.monitoring');
+
+        $this->registerCommands();
+
+        $core->pages([
+                MonitoringPage::class,
+            ]);
+
+        if (config('moonshine.monitoring.auto_menu')) {
+            $menu->add([
+                MenuItem::make(
+                    __('Log viewer'),
+                    MonitoringPage::class,
+                ),
+            ]);
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'moonshine.monitoring.auto_menu' => true,
-    'monitoring.migrations' => true,
-    'monitoring.purge_before' => '-1 day',
+    'auto_menu'    => true,
+    'migrations'   => true,
+    'purge_before' => '-1 day',
 ];
