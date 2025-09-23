@@ -1,14 +1,17 @@
 {
   "name": "zhandos717/moonshine-monitoring",
-  "description": "Server monitoring for MoonShine",
+  "description": "Server monitoring for MoonShine with real-time resource usage tracking",
   "keywords": [
     "moonshine",
     "monitoring",
-    "viewer"
+    "server",
+    "cpu",
+    "memory",
+    "disk"
   ],
   "type": "library",
   "license": "MIT",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "autoload": {
     "psr-4": {
       "Zhandos717\\MoonshineMonitoring\\": "src/"
@@ -16,7 +19,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Zhandos717\\MoonshineMonitoring\\Tests\\": "tests/"
+      "Zhandos717\\MoonshineMonitoring\\Tests\\": "tests/",
+      "Zhandos717\\MoonshineMonitoring\\Database\\Factories\\": "src/Database/Factories/"
     }
   },
   "authors": [
@@ -45,6 +49,12 @@
   },
   "scripts": {
     "test": "phpunit",
-    "test-coverage": "phpunit --coverage-html coverage"
+    "test-coverage": "phpunit --coverage-html coverage",
+    "post-install-cmd": [
+      "@php artisan vendor:publish --tag=moonshine-monitoring-assets --ansi"
+    ],
+    "post-update-cmd": [
+      "@php artisan vendor:publish --tag=moonshine-monitoring-assets --ansi"
+    ]
   }
 }

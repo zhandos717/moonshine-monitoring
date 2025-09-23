@@ -38,6 +38,11 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'moonshine-monitoring');
         $this->mergeConfigFrom(__DIR__.'/../config/monitoring.php', 'moonshine.monitoring');
+        
+        // Регистрация миграций
+        if ($this->app->runningInConsole() && config('moonshine.monitoring.migrations', true)) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        }
 
         $this->registerCommands();
 
@@ -50,6 +55,25 @@ class MonitoringServiceProvider extends ServiceProvider
                     MonitoringPage::class,
                 ),
             ]);
+        }
+        
+        // Публикация ресурсов
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/monitoring.php' => config_path('monitoring.php'),
+            ], 'moonshine-monitoring-config');
+            
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'moonshine-monitoring-migrations');
+            
+            $this->publishes([
+                __DIR__.'/../resources/views' => resource_path('views/vendor/moonshine-monitoring'),
+            ], 'moonshine-monitoring-views');
+            
+            $this->publishes([
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/moonshine-monitoring'),
+            ], 'moonshine-monitoring-lang');
         }
     }
 }

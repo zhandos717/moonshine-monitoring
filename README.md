@@ -17,6 +17,8 @@ Moonshine Monitoring is a Laravel package that provides system resource monitori
 - Automatic data purging based on configuration
 - Multi-instance support with instance naming
 - Pure PHP implementation (no shell scripts required)
+- Enhanced dashboard with progress bars and real-time updates
+- Multi-language support (English and Russian)
 
 ## Installation
 
@@ -69,6 +71,25 @@ After publishing the configuration file, you can modify the settings in `config/
 - `notifications`: Telegram notification settings (not yet implemented)
 - `migrations`: Enable or disable package migrations
 - `purge_before`: Automatically purge records older than this time period
+
+## Dashboard Features
+
+The updated monitoring dashboard includes:
+
+1. **Real-time Resource Monitoring**
+   - Visual progress bars for CPU, memory, and disk usage
+   - Current usage percentage display
+   - Auto-refresh functionality for real-time updates
+
+2. **Historical Data Visualization**
+   - Detailed table of historical monitoring records
+   - Time-based sorting of records
+   - Instance name identification
+
+3. **User Interface Enhancements**
+   - Multi-language support (English/Russian)
+   - Responsive design for different screen sizes
+   - Intuitive controls for data refresh
 
 ## Roadmap
 
@@ -126,6 +147,7 @@ This package now fully supports MoonShine 3.x with the following updates:
 - Updated controller with proper JSON responses
 - Fixed debug code issues
 - Enhanced dashboard with historical data charts
+- Improved user interface with real-time updates
 
 ## Issues and Improvements Needed
 
@@ -139,6 +161,10 @@ After analyzing the codebase and updating for MoonShine 3.x compatibility, here 
 2. **Incomplete Implementation**
    - Enhanced controller to return proper JSON responses
    - Improved monitoring dashboard with historical data visualization
+
+3. **Migration Registration**
+   - Fixed migration registration in service provider
+   - Added proper resource publishing configuration
 
 ### Remaining Issues
 

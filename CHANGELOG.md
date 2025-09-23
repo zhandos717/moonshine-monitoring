@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.2] - 2025-09-23
+
+### Added
+- Custom monitoring view with resource usage visualization
+- Language files for English and Russian translations
+- Auto-refresh functionality for real-time monitoring
+- Progress bars for better visualization of resource usage
+
+### Fixed
+- Migration registration in service provider
+- Resource publishing configuration
+- View component registration
+- Factory namespace issues
+
+### Changed
+- Updated monitoring view template
+- Improved data visualization in monitoring dashboard
+- Enhanced monitoring controller to support both AJAX and regular requests
+
 ## [1.1.0] - 2025-09-23
 
 ### Added

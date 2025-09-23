@@ -12,7 +12,7 @@ use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 class MonitoringComponent extends MoonShineComponent
 {
-    protected string $view = 'moonshine-monitoring::default';
+    protected string $view = 'moonshine-monitoring::monitoring';
 
     use WithColumnSpan;
     use WithLabel;
