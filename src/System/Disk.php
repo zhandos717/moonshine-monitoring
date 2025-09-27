@@ -4,11 +4,16 @@ namespace Zhandos717\MoonshineMonitoring\System;
 
 class Disk extends AbstractResource
 {
+    protected ?int $totalBytes = null;
+    protected ?int $usedBytes = null;
+
     protected function run(): void
     {
-        if (app()->environment() === 'testing') {
+        if (function_exists('app') && app() && method_exists(app(), 'environment') && app()->environment() === 'testing') {
             $this->setTotal(100);
             $this->setUsage(50);
+            $this->totalBytes = 500 * 1024 * 1024 * 1024; // 500GB for testing
+            $this->usedBytes = 250 * 1024 * 1024 * 1024; // 250GB for testing
             return;
         }
 
@@ -18,7 +23,23 @@ class Disk extends AbstractResource
         if ($diskInfo) {
             $this->setTotal($diskInfo['total']);
             $this->setUsage($diskInfo['usage']);
+            $this->totalBytes = $diskInfo['total_bytes'] ?? null;
+            $this->usedBytes = $diskInfo['used_bytes'] ?? null;
+        } else {
+            // Set default values if we can't get disk info
+            $this->setTotal(0);
+            $this->setUsage(0);
         }
+    }
+    
+    public function getTotalBytes(): ?int
+    {
+        return $this->totalBytes;
+    }
+    
+    public function getUsedBytes(): ?int
+    {
+        return $this->usedBytes;
     }
     
     private function getDiskInfo(): ?array
@@ -37,7 +58,9 @@ class Disk extends AbstractResource
             
             return [
                 'total' => 100,
-                'usage' => $usage
+                'usage' => $usage,
+                'total_bytes' => (int) $total,
+                'used_bytes' => (int) $used
             ];
         } catch (\Exception $e) {
             // В случае ошибки возвращаем null

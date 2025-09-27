@@ -19,7 +19,7 @@ class MonitoringComponentTest extends TestCase
     /** @test */
     public function it_can_be_instantiated()
     {
-        $component = new MonitoringComponent();
+        $component = new MonitoringComponent('Test Label');
         
         $this->assertInstanceOf(MonitoringComponent::class, $component);
     }
@@ -30,7 +30,7 @@ class MonitoringComponentTest extends TestCase
         // Create some test records
         MonitoringRecord::factory()->count(3)->create();
         
-        $component = new MonitoringComponent();
+        $component = new MonitoringComponent('Test Label');
         $viewData = $component->viewData();
         
         $this->assertIsArray($viewData);

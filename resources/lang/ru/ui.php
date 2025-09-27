@@ -8,4 +8,6 @@ return [
     'disk' => 'Диск',
     'instance_name' => 'Имя экземпляра',
     'timestamp' => 'Временная метка',
+    'core' => 'ядро',
+    'cores' => 'ядра',
 ];

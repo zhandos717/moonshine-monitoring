@@ -4,11 +4,16 @@ namespace Zhandos717\MoonshineMonitoring\System;
 
 class Memory extends AbstractResource
 {
+    protected ?int $totalBytes = null;
+    protected ?int $usedBytes = null;
+
     protected function run(): void
     {
-        if (app()->environment() === 'testing') {
+        if (function_exists('app') && app() && method_exists(app(), 'environment') && app()->environment() === 'testing') {
             $this->setTotal(100);
             $this->setUsage(50);
+            $this->totalBytes = 8 * 1024 * 1024 * 1024; // 8GB for testing
+            $this->usedBytes = 4 * 1024 * 1024 * 1024; // 4GB for testing
             return;
         }
 
@@ -18,7 +23,23 @@ class Memory extends AbstractResource
         if ($memoryInfo) {
             $this->setTotal($memoryInfo['total']);
             $this->setUsage($memoryInfo['usage']);
+            $this->totalBytes = $memoryInfo['total_bytes'] ?? null;
+            $this->usedBytes = $memoryInfo['used_bytes'] ?? null;
+        } else {
+            // Set default values if we can't get memory info
+            $this->setTotal(0);
+            $this->setUsage(0);
         }
+    }
+    
+    public function getTotalBytes(): ?int
+    {
+        return $this->totalBytes;
+    }
+    
+    public function getUsedBytes(): ?int
+    {
+        return $this->usedBytes;
     }
     
     private function getMemoryInfo(): ?array
@@ -63,9 +84,15 @@ class Memory extends AbstractResource
             $available = $memInfo['MemAvailable']; // в KB
             $used = $total - $available;
             
+            // Convert to bytes
+            $totalBytes = $total * 1024;
+            $usedBytes = $used * 1024;
+            
             return [
                 'total' => 100,
-                'usage' => round(($used / $total) * 100, 2)
+                'usage' => round(($used / $total) * 100, 2),
+                'total_bytes' => $totalBytes,
+                'used_bytes' => $usedBytes
             ];
         }
         
@@ -106,10 +133,25 @@ class Memory extends AbstractResource
             $usedPages = $activePages;
             
             if ($totalPages > 0) {
-                return [
-                    'total' => 100,
-                    'usage' => round(($usedPages / $totalPages) * 100, 2)
-                ];
+                // Get total physical memory using sysctl
+                $totalMemoryOutput = shell_exec('sysctl -n hw.memsize 2>/dev/null');
+                if ($totalMemoryOutput) {
+                    $totalMemoryBytes = (int) trim($totalMemoryOutput);
+                    $pageSizeBytes = $pageSize;
+                    $usedBytes = $usedPages * $pageSizeBytes;
+                    
+                    return [
+                        'total' => 100,
+                        'usage' => round(($usedPages / $totalPages) * 100, 2),
+                        'total_bytes' => $totalMemoryBytes,
+                        'used_bytes' => $usedBytes
+                    ];
+                } else {
+                    return [
+                        'total' => 100,
+                        'usage' => round(($usedPages / $totalPages) * 100, 2)
+                    ];
+                }
             }
         }
         
@@ -136,9 +178,15 @@ class Memory extends AbstractResource
                 $free = $memInfo['FreePhysicalMemory']; // в KB
                 $used = $total - $free;
                 
+                // Convert to bytes
+                $totalBytes = $total * 1024;
+                $usedBytes = $used * 1024;
+                
                 return [
                     'total' => 100,
-                    'usage' => round(($used / $total) * 100, 2)
+                    'usage' => round(($used / $total) * 100, 2),
+                    'total_bytes' => $totalBytes,
+                    'used_bytes' => $usedBytes
                 ];
             }
         }

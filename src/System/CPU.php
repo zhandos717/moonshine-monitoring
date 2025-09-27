@@ -4,21 +4,65 @@ namespace Zhandos717\MoonshineMonitoring\System;
 
 class CPU extends AbstractResource
 {
+    protected ?int $cores = null;
+
     protected function run(): void
     {
-        if (app()->environment() === 'testing') {
+        if (function_exists('app') && app() && method_exists(app(), 'environment') && app()->environment() === 'testing') {
             $this->setTotal(100);
             $this->setUsage(50);
+            $this->cores = 4; // for testing
             return;
         }
 
+        // Получаем количество ядер процессора
+        $this->cores = $this->getCpuCores();
+        
         // Используем PHP для получения информации о CPU
         $usage = $this->getCPUUsage();
         
         if (is_numeric($usage)) {
             $this->setTotal(100);
             $this->setUsage($usage);
+        } else {
+            // Set default values if we can't get CPU usage
+            $this->setTotal(0);
+            $this->setUsage(0);
         }
+    }
+    
+    public function getCores(): ?int
+    {
+        return $this->cores;
+    }
+    
+    private function getCpuCores(): ?int
+    {
+        $os = strtolower(PHP_OS);
+        
+        try {
+            if ($os === 'linux') {
+                // Подсчитываем количество ядер в /proc/cpuinfo
+                $cpuInfo = file_get_contents('/proc/cpuinfo');
+                $cores = substr_count($cpuInfo, 'processor');
+                return $cores > 0 ? $cores : null;
+            } elseif (strpos($os, 'darwin') !== false) { // macOS
+                $output = shell_exec('sysctl -n hw.ncpu 2>/dev/null');
+                if ($output) {
+                    return (int) trim($output);
+                }
+            } elseif (strpos($os, 'win') !== false) { // Windows
+                $output = getenv('NUMBER_OF_PROCESSORS');
+                if ($output) {
+                    return (int) $output;
+                }
+            }
+        } catch (\Exception $e) {
+            // В случае ошибки возвращаем null
+            return null;
+        }
+        
+        return null;
     }
     
     private function getCPUUsage(): ?float

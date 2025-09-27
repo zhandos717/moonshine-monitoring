@@ -37,17 +37,17 @@ abstract class AbstractResource implements SystemResource
 
     public function getUsage(): ?float
     {
-        return $this->usage;
+        return $this->usage ?? 0;
     }
 
     public function getTotal(): ?int
     {
-        return $this->total;
+        return $this->total ?? 0;
     }
 
     protected function run(): void
     {
-        if (app()->environment() === 'testing') {
+        if (function_exists('app') && app() && method_exists(app(), 'environment') && app()->environment() === 'testing') {
             $this->setTotal(100);
             $this->setUsage(50);
         }

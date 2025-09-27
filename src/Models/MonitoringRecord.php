@@ -15,12 +15,18 @@ class MonitoringRecord extends Model
         'cpu',
         'memory',
         'disk',
+        'cpu_cores',
+        'memory_total_bytes',
+        'disk_total_bytes',
     ];
 
     protected $casts = [
-        'cpu'    => 'float',
+        'cpu' => 'float',
         'memory' => 'float',
-        'disk'   => 'float',
+        'disk' => 'float',
+        'cpu_cores' => 'integer',
+        'memory_total_bytes' => 'integer',
+        'disk_total_bytes' => 'integer',
     ];
 
     protected static function newFactory()

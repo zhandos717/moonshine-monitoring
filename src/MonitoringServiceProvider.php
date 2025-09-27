@@ -37,10 +37,10 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'moonshine-monitoring');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'moonshine-monitoring');
-        $this->mergeConfigFrom(__DIR__.'/../config/monitoring.php', 'moonshine.monitoring');
+        $this->mergeConfigFrom(__DIR__.'/../config/monitoring.php', 'monitoring');
         
         // Регистрация миграций
-        if ($this->app->runningInConsole() && config('moonshine.monitoring.migrations', true)) {
+        if ($this->app->runningInConsole() && config('monitoring.migrations', true)) {
             $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
 
@@ -48,7 +48,7 @@ class MonitoringServiceProvider extends ServiceProvider
 
         $core->pages([MonitoringPage::class]);
 
-        if (config('moonshine.monitoring.auto_menu')) {
+        if (config('monitoring.auto_menu')) {
             $menu->add([
                 MenuItem::make(
                     __('moonshine-monitoring::ui.monitoring'),

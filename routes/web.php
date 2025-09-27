@@ -12,4 +12,9 @@ Route::group([
         ->name(
             'monitoring.index'
         );
+        
+    Route::get('monitoring/data', [\Zhandos717\MoonshineMonitoring\Controllers\MonitoringController::class, 'data'])
+        ->name(
+            'monitoring.data'
+        );
 });
