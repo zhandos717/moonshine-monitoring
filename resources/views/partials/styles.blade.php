@@ -1,7 +1,12 @@
 @once
 <style>
     .msm {
-        --msm-blue: #007aff; --msm-green: #34c759; --msm-orange: #ff9f0a; --msm-red: #ff3b30;
+        /* Цвета берутся из темы MoonShine: 4.x — --ms-cm-*, 3.x — RGB-тройки вида --primary: 120, 67, 233 */
+        --msm-blue: var(--ms-cm-primary, rgb(var(--primary, 0, 122, 255)));
+        --msm-on-blue: var(--ms-cm-primary-text, #fff);
+        --msm-green: var(--ms-cm-success, rgb(var(--success-bg, 52, 199, 89)));
+        --msm-orange: var(--ms-cm-warning, rgb(var(--warning-bg, 255, 159, 10)));
+        --msm-red: var(--ms-cm-error, rgb(var(--error, 255, 59, 48)));
         --msm-muted: rgb(120 120 128 / 0.95); --msm-line: rgb(120 120 128 / 0.18);
         --msm-track: rgb(120 120 128 / 0.16); --msm-card: rgb(120 120 128 / 0.06);
         --msm-tip: rgb(255 255 255 / 0.96); --msm-tip-ink: #1c1c1e;
@@ -9,12 +14,12 @@
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
         font-variant-numeric: tabular-nums;
     }
-    .dark .msm { --msm-blue: #0a84ff; --msm-green: #30d158; --msm-orange: #ff9f0a; --msm-red: #ff453a; --msm-tip: rgb(44 44 46 / 0.96); --msm-tip-ink: #f2f2f7; }
+    .dark .msm { --msm-tip: rgb(44 44 46 / 0.96); --msm-tip-ink: #f2f2f7; }
     .msm-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
     .msm-segmented { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--msm-track); }
     .msm-segmented a { padding: .35rem .9rem; border-radius: 999px; font-size: .8125rem; font-weight: 500; color: var(--msm-muted); transition: background .15s, color .15s; }
     .msm-segmented a[aria-current="page"] { background: var(--msm-tip); color: var(--msm-tip-ink); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
-    .msm-pill { display: inline-flex; align-items: center; gap: .4rem; padding: .4rem .9rem; border-radius: 999px; font-size: .8125rem; font-weight: 500; background: var(--msm-blue); color: #fff; }
+    .msm-pill { display: inline-flex; align-items: center; gap: .4rem; padding: .4rem .9rem; border-radius: 999px; font-size: .8125rem; font-weight: 500; background: var(--msm-blue); color: var(--msm-on-blue); }
     .msm-pill .icon-wrapper, .msm-pill svg { width: 1rem; height: 1rem; }
     .msm-tiles { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); }
     .msm-card { border-radius: 1.25rem; padding: 1.1rem 1.25rem; background: var(--msm-card); border: 1px solid var(--msm-line); min-width: 0; }

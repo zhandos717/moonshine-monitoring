@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.1] - 2026-10-05
+
+### Changed
+- Dashboard and widget colors follow the installed MoonShine theme: primary color for charts and buttons, success / warning / error colors for statuses (`--ms-cm-*` on MoonShine 4, `--primary`, `--success-bg`, `--warning-bg`, `--error` on MoonShine 3). The Apple palette is used only when a theme variable is missing.
+
 ## [1.4.0] - 2026-10-05
 
 ### Added

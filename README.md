@@ -52,7 +52,7 @@ Moonshine Monitoring is a Laravel package that provides system resource monitori
 - Alerts by email and Telegram when CPU, memory or disk stay above a threshold
 - Dashboard widget for the MoonShine home page
 - Old records are purged automatically
-- Light and dark MoonShine themes
+- Follows the MoonShine theme: light / dark mode and the theme's primary, success, warning and error colors
 - Enhanced dashboard with progress bars and real-time updates
 - Multi-language support (English and Russian)
 
