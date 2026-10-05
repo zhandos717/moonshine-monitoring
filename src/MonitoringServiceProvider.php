@@ -45,8 +45,11 @@ class MonitoringServiceProvider extends ServiceProvider
         }
     }
 
-    public function boot(CoreContract $core, MenuManagerContract $menu): void
+    public function boot(): void
     {
+        // В MoonShine 3 CoreContract обобщённый, в 4 — нет: берём из контейнера, чтобы сигнатура подходила обеим
+        $core = $this->app->make(CoreContract::class);
+        $menu = $this->app->make(MenuManagerContract::class);
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'moonshine-monitoring');
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'moonshine-monitoring');
