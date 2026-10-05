@@ -6,7 +6,9 @@
 
 Server monitoring package for the [MoonShine](https://moonshine-laravel.com) admin panel: CPU, memory and disk usage with history, right inside your admin.
 
-![Dashboard](docs/dashboard-light.jpg)
+| Light | Dark |
+|---|---|
+| ![Dashboard, light theme](docs/dashboard-light.jpg) | ![Dashboard, dark theme](docs/dashboard-dark.jpg) |
 
 ## Requirements
 
