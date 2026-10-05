@@ -1,0 +1,11 @@
+{
+  "name": "moonshine-monitoring-screenshots",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "shoot": "node shoot.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.0.0"
+  }
+}

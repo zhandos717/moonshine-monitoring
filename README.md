@@ -220,6 +220,15 @@ The tests are organized as follows:
 - `tests/Feature/` - Feature tests for integrated functionality
 - `tests/TestCase.php` - Base test case with package configuration
 
+## Screenshots
+
+README screenshots in `docs/` are taken by `docs/screenshots/shoot.mjs` (headless Chrome via puppeteer-core) from a running Laravel + MoonShine app with this package:
+
+```bash
+cd docs/screenshots && npm install
+MS_URL=http://127.0.0.1:8000/admin MS_USER=admin@example.com MS_PASSWORD=secret npm run shoot
+```
+
 ## Contributing
 
 Contributions are welcome! Here's how you can help:
