@@ -6,6 +6,8 @@
 
 Server monitoring package for the [MoonShine](https://moonshine-laravel.com) admin panel: CPU, memory and disk usage with history, right inside your admin.
 
+![Dashboard](docs/dashboard-light.jpg)
+
 ## Requirements
 
 | | Version |
@@ -30,6 +32,9 @@ Moonshine Monitoring is a Laravel package that provides system resource monitori
 - Multi-instance support with instance naming
 - Pure PHP implementation (no shell scripts required)
 - Supports MoonShine 3.x and 4.x
+- Memory spike detection: spikes are marked on the chart and listed with peak, duration and rise over the usual level
+- Time ranges: 1 hour, 24 hours, 7 days
+- Light and dark MoonShine themes
 - Enhanced dashboard with progress bars and real-time updates
 - Multi-language support (English and Russian)
 
@@ -89,6 +94,9 @@ After publishing the configuration file, you can modify the settings in `config/
 - `auto_menu`: Whether to automatically add the monitoring page to the MoonShine menu
 - `instance_name`: The name of this monitoring instance (defaults to your app name)
 - `migrations`: Enable or disable package migrations
+- `thresholds.warning` / `thresholds.critical`: status of the usage tiles, the threshold line on the memory chart (default 85 / 95)
+- `memory_spikes.min_rise`: how many percentage points above the usual level counts as a spike (default 8)
+- `memory_spikes.window`: number of recent calm samples the usual level is calculated from (default 15)
 - `purge_before`: retention period for old records (not applied automatically yet)
 
 ## Dashboard Features

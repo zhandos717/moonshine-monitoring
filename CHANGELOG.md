@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.3.0] - 2026-10-05
+
+### Added
+- Redesigned dashboard: status tiles (normal / high / critical), memory, CPU and disk charts with hover tooltips, light and dark theme support.
+- Memory spike detection: spikes are marked on the chart and listed with peak, time, duration, rise over the usual level and used memory.
+- Time ranges: 1 hour, 24 hours, 7 days; long ranges are downsampled to 240 points, memory keeps the bucket maximum so peaks are not lost.
+- Config: `thresholds.warning`, `thresholds.critical`, `memory_spikes.min_rise`, `memory_spikes.window`.
+
+### Changed
+- Dashboard history shows only records of the current instance.
+
 ## [1.2.0] - 2026-10-05
 
 ### Added
