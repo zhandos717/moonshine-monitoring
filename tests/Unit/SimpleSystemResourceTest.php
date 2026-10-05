@@ -2,11 +2,12 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class SimpleSystemResourceTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_the_correct_structure()
     {
         // This is a placeholder test since we can't instantiate the classes without Laravel

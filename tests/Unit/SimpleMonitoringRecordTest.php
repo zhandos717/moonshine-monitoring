@@ -2,12 +2,13 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 class SimpleMonitoringRecordTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_the_correct_fillable_attributes()
     {
         $record = new MonitoringRecord();
@@ -17,12 +18,15 @@ class SimpleMonitoringRecordTest extends TestCase
             'cpu',
             'memory',
             'disk',
+            'cpu_cores',
+            'memory_total_bytes',
+            'disk_total_bytes',
         ];
         
         $this->assertEquals($expected, $record->getFillable());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_the_correct_casts()
     {
         $record = new MonitoringRecord();

@@ -2,6 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Components\MonitoringComponent;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
@@ -16,7 +17,7 @@ class MonitoringComponentTest extends TestCase
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_instantiated()
     {
         $component = new MonitoringComponent('Test Label');
@@ -24,7 +25,7 @@ class MonitoringComponentTest extends TestCase
         $this->assertInstanceOf(MonitoringComponent::class, $component);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_view_data()
     {
         // Create some test records

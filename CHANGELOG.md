@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.0] - 2026-10-05
+
+### Added
+- MoonShine 4.x support (MoonShine 3.x is still supported).
+- CI matrix: PHP 8.2–8.4 × MoonShine 3.x / 4.x.
+
+### Fixed
+- Package could not be installed in projects with `minimum-stability: stable`: removed the unused `moonshine/apexcharts: dev-master` dependency and the hardcoded `version` field.
+- Monitoring routes were registered without MoonShine authentication middleware; `/admin/monitoring/data` is now available to authenticated admins only.
+- Routes broke `route:list` and request handling because the auth middleware array was nested inside the middleware list.
+- Menu item argument order on MoonShine 4 (`MenuItem::make($filler, $label)`).
+- Refresh button rendered the icon name as text instead of the icon.
+- CPU usage on macOS ignored the number of cores and showed values close to 100%.
+- Package test suite: registered the MoonShine service provider, removed tests for deleted shell scripts.
+
+### Changed
+- Requires PHP 8.2+ (same as MoonShine 3.x/4.x).
+- `moonshine-monitoring:record` prints a confirmation line.
+- README: correct publish tag, Laravel 11+ scheduling, requirements table.
+
 ## [1.1.3] - 2025-09-23
 
 ### Fixed

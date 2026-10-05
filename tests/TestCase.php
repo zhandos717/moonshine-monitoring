@@ -2,7 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests;
 
-use Illuminate\Foundation\Application;
+use MoonShine\Laravel\Providers\MoonShineServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Zhandos717\MoonshineMonitoring\MonitoringServiceProvider;
 
@@ -11,6 +11,7 @@ class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
+            MoonShineServiceProvider::class,
             MonitoringServiceProvider::class,
         ];
     }
@@ -35,23 +36,10 @@ class TestCase extends OrchestraTestCase
             'migrations' => true,
             'purge_before' => '-1 day',
         ]);
-        
-        // MoonShine configuration
-        $app['config']->set('moonshine', [
-            'dir' => 'app/MoonShine',
-            'namespace' => 'App\MoonShine',
-            'route' => [
-                'prefix' => 'admin',
-                'middleware' => ['web'],
-            ],
-            'auth' => [
-                'enable' => true,
-                'middleware' => 'auth',
-            ],
-            'locales' => ['en', 'ru'],
-        ]);
+
+        $app['config']->set('app.key', 'base64:' . base64_encode(str_repeat('a', 32)));
     }
-    
+
     protected function defineEnvironment($app)
     {
         // Define any additional environment setup here

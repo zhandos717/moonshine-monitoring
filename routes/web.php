@@ -1,20 +1,13 @@
 <?php
 
-
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
+use Zhandos717\MoonshineMonitoring\Controllers\MonitoringController;
 
-Route::group([
-    'prefix'     => config('moonshine.route.prefix'),
-    'as'         => 'moonshine.',
-    'middleware' => [config('moonshine.auth.middleware'), 'web'],
-], function () {
-    Route::get('monitoring', [\Zhandos717\MoonshineMonitoring\Controllers\MonitoringController::class, 'index'])
-        ->name(
-            'monitoring.index'
-        );
-        
-    Route::get('monitoring/data', [\Zhandos717\MoonshineMonitoring\Controllers\MonitoringController::class, 'data'])
-        ->name(
-            'monitoring.data'
-        );
+Route::moonshine(static function (Router $router): void {
+    // withAuthenticate макроса перекрывается middleware группы по умолчанию, поэтому авторизация задаётся явно
+    $router->middleware(moonshineConfig()->getAuthMiddleware())->group(static function (Router $router): void {
+        $router->get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+        $router->get('monitoring/data', [MonitoringController::class, 'data'])->name('monitoring.data');
+    });
 });

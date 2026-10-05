@@ -2,6 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Commands\RecordCommand;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
@@ -17,15 +18,13 @@ class RecordCommandTest extends TestCase
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_execute_the_record_command()
     {
-        // Mock the monitoring facade to return specific values
-        $this->mockMonitoringFacade();
         
         // Execute the command
         $this->artisan('moonshine-monitoring:record')
-             ->expectsOutput('Record resources usages')
+             ->expectsOutput('Resource usage recorded')
              ->assertExitCode(0);
         
         // Assert that a record was created
@@ -34,9 +33,4 @@ class RecordCommandTest extends TestCase
         ]);
     }
     
-    private function mockMonitoringFacade()
-    {
-        // We'll create a more comprehensive test by mocking the shell execution
-        // For now, we'll test that the command can be instantiated
-    }
 }

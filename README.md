@@ -1,6 +1,18 @@
 # Moonshine Monitoring
 
-Server monitoring package for MoonShine admin panel.
+[![Tests](https://github.com/zhandos717/moonshine-monitoring/actions/workflows/tests.yml/badge.svg)](https://github.com/zhandos717/moonshine-monitoring/actions/workflows/tests.yml)
+[![Packagist](https://img.shields.io/packagist/v/zhandos717/moonshine-monitoring.svg)](https://packagist.org/packages/zhandos717/moonshine-monitoring)
+[![MoonShine](https://img.shields.io/badge/MoonShine-3.x%20%7C%204.x-purple)](https://moonshine-laravel.com)
+
+Server monitoring package for the [MoonShine](https://moonshine-laravel.com) admin panel: CPU, memory and disk usage with history, right inside your admin.
+
+## Requirements
+
+| | Version |
+|---|---|
+| PHP | 8.2+ |
+| Laravel | 10, 11, 12, 13 |
+| MoonShine | 3.x, 4.x |
 
 ## Description
 
@@ -17,6 +29,7 @@ Moonshine Monitoring is a Laravel package that provides system resource monitori
 - Automatic data purging based on configuration
 - Multi-instance support with instance naming
 - Pure PHP implementation (no shell scripts required)
+- Supports MoonShine 3.x and 4.x
 - Enhanced dashboard with progress bars and real-time updates
 - Multi-language support (English and Russian)
 
@@ -29,7 +42,7 @@ Moonshine Monitoring is a Laravel package that provides system resource monitori
 
 2. Publish the configuration file:
    ```bash
-   php artisan vendor:publish --provider="Zhandos717\MoonshineMonitoring\MonitoringServiceProvider" --tag=config
+   php artisan vendor:publish --tag=moonshine-monitoring-config
    ```
 
 3. Run the migrations:
@@ -54,9 +67,16 @@ php artisan moonshine-monitoring:record
 
 ### Scheduling
 
-To continuously monitor your system, schedule the record command in your `app/Console/Kernel.php`:
+Schedule the record command to collect history. Laravel 11+ (`routes/console.php`):
 ```php
-protected function schedule(Schedule $schedule)
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('moonshine-monitoring:record')->everyMinute();
+```
+
+Laravel 10 (`app/Console/Kernel.php`):
+```php
+protected function schedule(Schedule $schedule): void
 {
     $schedule->command('moonshine-monitoring:record')->everyMinute();
 }
@@ -68,9 +88,8 @@ After publishing the configuration file, you can modify the settings in `config/
 
 - `auto_menu`: Whether to automatically add the monitoring page to the MoonShine menu
 - `instance_name`: The name of this monitoring instance (defaults to your app name)
-- `notifications`: Telegram notification settings (not yet implemented)
 - `migrations`: Enable or disable package migrations
-- `purge_before`: Automatically purge records older than this time period
+- `purge_before`: retention period for old records (not applied automatically yet)
 
 ## Dashboard Features
 
@@ -138,65 +157,9 @@ The updated monitoring dashboard includes:
    - CSV data export
    - Scheduled report delivery
 
-## MoonShine 3.x Compatibility
+## Security
 
-This package now fully supports MoonShine 3.x with the following updates:
-
-- Updated service provider for new MoonShine architecture
-- Compatible page and component implementations
-- Updated controller with proper JSON responses
-- Fixed debug code issues
-- Enhanced dashboard with historical data charts
-- Improved user interface with real-time updates
-
-## Issues and Improvements Needed
-
-After analyzing the codebase and updating for MoonShine 3.x compatibility, here are the key technical issues and improvements needed:
-
-### Resolved Issues
-
-1. **Debug Code in Controllers**
-   - Removed `dd()` statements from `MonitoringController` and `MonitoringComponent`
-
-2. **Incomplete Implementation**
-   - Enhanced controller to return proper JSON responses
-   - Improved monitoring dashboard with historical data visualization
-
-3. **Migration Registration**
-   - Fixed migration registration in service provider
-   - Added proper resource publishing configuration
-
-### Remaining Issues
-
-1. **Configuration Issues**
-   - The notifications section in the config file is not implemented but has a placeholder
-   - The purge functionality for old records is configured but not implemented
-
-2. **Platform Support**
-   - Shell scripts only exist for Darwin (macOS) and Linux, with no Windows support
-   - The script resolution logic may not work correctly on all systems
-
-3. **Code Quality**
-   - Missing input validation in several components
-   - Limited error handling in shell script execution
-   - No unit tests exist for the package
-
-### Enhancement Opportunities
-
-1. **Data Visualization**
-   - Add more detailed historical data charts
-   - Implement time range filtering for metrics
-   - Add comparison capabilities between different time periods
-
-2. **Performance Optimization**
-   - Implement caching for frequently accessed data
-   - Add batch processing for recording multiple metrics
-   - Optimize database queries for large datasets
-
-3. **User Experience**
-   - Add customizable alert thresholds
-   - Implement dashboard widgets that can be rearranged
-   - Add export functionality for monitoring data
+The page and the `monitoring/data` JSON endpoint are registered inside the MoonShine route group and protected by MoonShine authentication middleware.
 
 ## Testing
 
@@ -215,7 +178,7 @@ composer test-coverage
 - Unit tests for all models, actions, and system resources
 - Feature tests for controllers and pages
 - Configuration tests
-- Shell script path validation
+- Tested against MoonShine 3.x and 4.x on PHP 8.2–8.4 in CI
 
 ### Running Tests
 
@@ -235,16 +198,6 @@ The tests are organized as follows:
 - `tests/Unit/` - Unit tests for individual components
 - `tests/Feature/` - Feature tests for integrated functionality
 - `tests/TestCase.php` - Base test case with package configuration
-
-### Current Test Status
-
-Currently, we have implemented:
-- Simple unit tests that don't require the full Laravel/MoonShine environment
-- Tests for system resources (CPU, Memory, Disk)
-- Tests for the MonitoringRecord model
-- Basic configuration tests
-
-Some tests that require the full MoonShine environment are currently failing due to dependency injection issues. These will be resolved in future updates.
 
 ## Contributing
 
@@ -266,7 +219,7 @@ Contributions are welcome! Here's how you can help:
 ### Areas Needing Contribution
 
 1. **Windows Support**
-   - Create PowerShell scripts for Windows systems
+   - Replace deprecated `wmic` calls (removed in Windows 11 24H2)
    - Test cross-platform compatibility
 
 2. **Additional Metrics**
@@ -283,12 +236,6 @@ Contributions are welcome! Here's how you can help:
    - Expand usage examples
    - Add troubleshooting guides
    - Create API documentation
-
-## Requirements
-
-- PHP 8.2 or higher
-- Laravel 10.0 or higher
-- MoonShine 3.0 or higher
 
 ## License
 

@@ -120,21 +120,14 @@ class CPU extends AbstractResource
     
     private function getMacCPUUsage(): ?float
     {
-        // Используем sysctl для получения информации о CPU на macOS
-        $output = shell_exec('sysctl -n vm.loadavg');
-        if ($output) {
-            // Парсим load average и конвертируем в проценты
-            $loads = explode(' ', trim($output, '{} '));
-            if (isset($loads[0])) {
-                // Load average не напрямую процент использования CPU,
-                // но мы можем использовать его как приближение
-                $load = floatval(trim($loads[0]));
-                // Нормализуем значение (простая эвристика)
-                return min(100, round($load * 25, 2));
-            }
+        // macOS не отдаёт мгновенную загрузку без внешних утилит: берём load average за минуту на ядро
+        $loads = sys_getloadavg();
+        $cores = $this->cores ?? $this->getCpuCores();
+        if ($loads === false || !$cores) {
+            return null;
         }
-        
-        return null;
+
+        return min(100, round($loads[0] / $cores * 100, 2));
     }
     
     private function getWindowsCPUUsage(): ?float

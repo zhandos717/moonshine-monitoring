@@ -4,10 +4,10 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">{{ __('moonshine-monitoring::ui.monitoring') }}</h2>
                 <div class="flex gap-2">
-                    <x-moonshine::link-button 
-                        icon="arrow-path"
-                        @click="fetchMonitoringData()"
-                    >
+                    <x-moonshine::link-button @click="fetchMonitoringData()">
+                        <x-slot:icon>
+                            <x-moonshine::icon icon="arrow-path" path="moonshine::icons" />
+                        </x-slot:icon>
                         {{ __('moonshine-monitoring::ui.refresh') }}
                     </x-moonshine::link-button>
                 </div>

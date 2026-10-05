@@ -11,6 +11,7 @@ use Zhandos717\MoonshineMonitoring\System\Monitoring;
 use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
 use MoonShine\Contracts\MenuManager\MenuManagerContract;
 use MoonShine\MenuManager\MenuItem;
+use ReflectionMethod;
 
 
 class MonitoringServiceProvider extends ServiceProvider
@@ -21,6 +22,18 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->app->bind('monitoring', function () {
             return new Monitoring();
         });
+    }
+
+    /**
+     * MoonShine 3: MenuItem::make($label, $filler); MoonShine 4: MenuItem::make($filler, $label).
+     */
+    private function menuItem(string $label, string $filler): MenuItem
+    {
+        $firstArgument = (new ReflectionMethod(MenuItem::class, '__construct'))->getParameters()[0]->getName();
+
+        return $firstArgument === 'filler'
+            ? MenuItem::make($filler, $label)
+            : MenuItem::make($label, $filler);
     }
 
     private function registerCommands(): void
@@ -49,12 +62,7 @@ class MonitoringServiceProvider extends ServiceProvider
         $core->pages([MonitoringPage::class]);
 
         if (config('monitoring.auto_menu')) {
-            $menu->add([
-                MenuItem::make(
-                    __('moonshine-monitoring::ui.monitoring'),
-                    MonitoringPage::class,
-                ),
-            ]);
+            $menu->add([$this->menuItem(__('moonshine-monitoring::ui.monitoring'), MonitoringPage::class)]);
         }
         
         // Публикация ресурсов

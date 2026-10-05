@@ -2,6 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 class MonitoringRecordTest extends TestCase
@@ -14,7 +15,7 @@ class MonitoringRecordTest extends TestCase
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_monitoring_record()
     {
         $record = MonitoringRecord::create([
@@ -38,7 +39,7 @@ class MonitoringRecordTest extends TestCase
         $this->assertEquals(75.8, $record->disk);
     }
 
-    /** @test */
+    #[Test]
     public function it_casts_values_to_correct_types()
     {
         $record = MonitoringRecord::create([

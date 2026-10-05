@@ -2,6 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zhandos717\MoonshineMonitoring\System\CPU;
 use Zhandos717\MoonshineMonitoring\System\Memory;
@@ -9,7 +10,7 @@ use Zhandos717\MoonshineMonitoring\System\Disk;
 
 class PHPSysResourceTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_has_correct_class_structure()
     {
         // Проверяем только структуру классов, не создавая экземпляры

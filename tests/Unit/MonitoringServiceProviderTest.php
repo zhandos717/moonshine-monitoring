@@ -2,13 +2,14 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\MonitoringServiceProvider;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 
 class MonitoringServiceProviderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_binds_the_monitoring_facade()
     {
         $monitoring = app('monitoring');
@@ -16,7 +17,7 @@ class MonitoringServiceProviderTest extends TestCase
         $this->assertNotNull($monitoring);
     }
 
-    /** @test */
+    #[Test]
     public function it_loads_the_configuration()
     {
         $config = config('monitoring');
@@ -26,7 +27,7 @@ class MonitoringServiceProviderTest extends TestCase
         $this->assertArrayHasKey('instance_name', $config);
     }
 
-    /** @test */
+    #[Test]
     public function it_registers_the_record_command()
     {
         // Test that the command is registered

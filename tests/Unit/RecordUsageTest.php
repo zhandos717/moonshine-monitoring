@@ -2,6 +2,7 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Actions\RecordUsage;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
@@ -16,7 +17,7 @@ class RecordUsageTest extends TestCase
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_record_resource_usage()
     {
         $action = new RecordUsage();
@@ -36,7 +37,7 @@ class RecordUsageTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_missing_resource_values()
     {
         $action = new RecordUsage();

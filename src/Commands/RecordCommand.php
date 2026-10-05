@@ -38,5 +38,7 @@ class RecordCommand extends Command
             'memory' => Monitoring::memory()->getUsage(),
             'disk'   => Monitoring::disk()->getUsage(),
         ]);
+
+        $this->info('Resource usage recorded');
     }
 }

@@ -2,43 +2,44 @@
 
 namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Pages\MonitoringPage;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
 
 class MonitoringPageTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_be_instantiated()
     {
-        $page = new MonitoringPage();
+        $page = app(MonitoringPage::class);
         
         $this->assertInstanceOf(MonitoringPage::class, $page);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_the_correct_title()
     {
-        $page = new MonitoringPage();
-        $title = $page->title();
+        $page = app(MonitoringPage::class);
+        $title = $page->getTitle();
         
         // This will be translated, so we check if it returns a string
         $this->assertIsString($title);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_breadcrumbs()
     {
-        $page = new MonitoringPage();
-        $breadcrumbs = $page->breadcrumbs();
+        $page = app(MonitoringPage::class);
+        $breadcrumbs = $page->getBreadcrumbs();
         
         $this->assertIsArray($breadcrumbs);
         $this->assertNotEmpty($breadcrumbs);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_components()
     {
-        $page = new MonitoringPage();
+        $page = app(MonitoringPage::class);
         $components = $page->components();
         
         $this->assertIsArray($components);
