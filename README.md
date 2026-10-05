@@ -8,7 +8,18 @@ Server monitoring package for the [MoonShine](https://moonshine-laravel.com) adm
 
 | Light | Dark |
 |---|---|
-| ![Dashboard, light theme](docs/dashboard-light.jpg) | ![Dashboard, dark theme](docs/dashboard-dark.jpg) |
+| ![Dashboard, light theme](docs/dashboard-light.png) | ![Dashboard, dark theme](docs/dashboard-dark.png) |
+
+**Memory spikes**
+
+![Memory spikes](docs/memory-spikes.png)
+
+**Mobile**
+
+<p>
+  <img src="docs/dashboard-mobile.png" alt="Dashboard on mobile" width="300">
+  <img src="docs/dashboard-mobile-chart.png" alt="Memory chart on mobile" width="300">
+</p>
 
 ## Requirements
 
