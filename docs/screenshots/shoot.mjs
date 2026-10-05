@@ -54,6 +54,11 @@ if (spikes) {
     await card.screenshot({ path: `${out}/memory-spikes.png` });
 }
 
+const widget = await page.goto(`${base}`, { waitUntil: 'networkidle0' }).then(() => page.$('.msm'));
+if (widget) {
+    await widget.screenshot({ path: `${out}/dashboard-widget.png` });
+}
+
 await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
 await open('light');
 await page.screenshot({ path: `${out}/dashboard-mobile.png` });

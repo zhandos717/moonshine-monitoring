@@ -37,4 +37,10 @@ return [
     'no_data' => 'Пока нет истории',
     'no_data_hint' => 'Добавьте команду в расписание, чтобы собирать замеры каждую минуту:',
     'peak_mem' => 'пик памяти',
+    'alert_title' => ':metric на :instance выше порога',
+    'alert_text' => 'Уже :minutes мин выше :threshold%: сейчас :current%, пик :peak%.',
+    'server' => 'Сервер',
+    'auto_refresh' => 'Автообновление',
+    'updated' => 'Обновлено :time',
+    'details' => 'Подробнее',
 ];

@@ -4,6 +4,7 @@ namespace Zhandos717\MoonshineMonitoring\Tests\Feature;
 
 use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Auth\User;
+use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
 
@@ -30,12 +31,14 @@ class MonitoringControllerTest extends TestCase
             'instance_name' => 'test-instance',
         ]);
 
+        Monitoring::fake();
         $user = (new User())->forceFill(['id' => 1]);
 
         $this->actingAs($user, 'moonshine')
             ->getJson('/admin/monitoring/data')
             ->assertOk()
             ->assertJsonPath('status', 'success')
-            ->assertJsonCount(6, 'records');
+            ->assertJsonCount(5, 'records')
+            ->assertJsonPath('current.memory', 50);
     }
 }

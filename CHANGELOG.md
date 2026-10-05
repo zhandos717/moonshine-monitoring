@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.4.0] - 2026-10-05
+
+### Added
+- Alerts by email and Telegram when CPU, memory or disk stay above a threshold for N minutes, with a cooldown between repeats.
+- Server switcher on the dashboard for several instances writing to one database; other servers show their last sample.
+- Dashboard auto refresh without page reload (`auto_refresh`, toggle on the page).
+- `MonitoringWidget` for the MoonShine home page.
+- Automatic purge of old records in `moonshine-monitoring:record`; `MonitoringRecord` is `MassPrunable`.
+- `Monitoring::fake()` to replace measurements in application tests.
+- Composite index on `(instance_name, created_at)`.
+- `disk_path` config option.
+- PHPStan (Larastan, level 6) in CI.
+
+### Fixed
+- CPU on Linux was the average since boot; it is now measured over a 250 ms interval.
+- Memory on macOS counted only active pages and was understated; it now matches Activity Monitor (app + wired + compressed).
+- Windows metrics used `wmic`, removed in Windows 11 24H2; they now use PowerShell `Get-CimInstance`.
+- The record command measured every resource twice.
+
+### Changed
+- `purge_before` now works and defaults to `-30 days` (was `-1 day`, never applied). Check it before upgrading if you need longer history.
+- Resources no longer return fake 50% values when `APP_ENV=testing`; use `Monitoring::fake()`.
+- `/monitoring/data` returns `current` separately from `records` and only for the current instance.
+
+### Removed
+- `GET /admin/monitoring` route (the dashboard is the MoonShine page), `Support\Format`, duplicate factory in `database/factories`.
+
 ## [1.3.0] - 2026-10-05
 
 ### Added

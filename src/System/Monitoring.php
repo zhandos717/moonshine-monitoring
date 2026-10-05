@@ -4,18 +4,18 @@ namespace Zhandos717\MoonshineMonitoring\System;
 
 class Monitoring
 {
-    public function cpu(): SystemResource
+    public function cpu(): CpuResource
     {
         return new CPU();
     }
 
-    public function memory(): SystemResource
+    public function memory(): SizedResource
     {
         return new Memory();
     }
 
-    public function disk(): SystemResource
+    public function disk(): SizedResource
     {
-        return new Disk();
+        return new Disk((string) config('monitoring.disk_path', '/'));
     }
 }

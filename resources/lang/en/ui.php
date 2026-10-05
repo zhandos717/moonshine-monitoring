@@ -37,4 +37,10 @@ return [
     'no_data' => 'No history yet',
     'no_data_hint' => 'Schedule the command to collect a sample every minute:',
     'peak_mem' => 'memory peak',
+    'alert_title' => ':metric on :instance is above the threshold',
+    'alert_text' => 'Above :threshold% for :minutes min: now :current%, peak :peak%.',
+    'server' => 'Server',
+    'auto_refresh' => 'Auto refresh',
+    'updated' => 'Updated :time',
+    'details' => 'Details',
 ];

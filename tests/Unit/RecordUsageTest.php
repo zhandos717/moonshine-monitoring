@@ -4,6 +4,7 @@ namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Actions\RecordUsage;
+use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
 
@@ -38,21 +39,18 @@ class RecordUsageTest extends TestCase
     }
 
     #[Test]
-    public function it_handles_missing_resource_values()
+    public function it_measures_values_that_are_not_passed()
     {
-        $action = new RecordUsage();
-        
-        $record = $action->record([
-            'cpu' => 45.5,
-            // memory and disk are missing
-        ]);
+        Monitoring::fake(cpu: 10, memory: 20, disk: 30, cores: 8);
 
-        $this->assertInstanceOf(MonitoringRecord::class, $record);
+        (new RecordUsage())->record(['cpu' => 45.5]);
+
         $this->assertDatabaseHas('monitoring_records', [
             'instance_name' => 'test-instance',
             'cpu' => 45.5,
-            'memory' => null,
-            'disk' => null,
+            'memory' => 20,
+            'disk' => 30,
+            'cpu_cores' => 8,
         ]);
     }
 }

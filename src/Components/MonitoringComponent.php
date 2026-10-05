@@ -3,7 +3,6 @@
 namespace Zhandos717\MoonshineMonitoring\Components;
 
 use Closure;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use MoonShine\UI\Components\MoonShineComponent;
 use MoonShine\UI\Traits\Components\WithColumnSpan;
@@ -12,6 +11,7 @@ use MoonShine\UI\Traits\WithLabel;
 use Throwable;
 use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
+use Zhandos717\MoonshineMonitoring\Support\Instance;
 use Zhandos717\MoonshineMonitoring\Support\MemorySpikeDetector;
 
 class MonitoringComponent extends MoonShineComponent
@@ -37,10 +37,14 @@ class MonitoringComponent extends MoonShineComponent
     public function viewData(): array
     {
         $range = array_key_exists((string) request('range'), self::RANGES) ? (string) request('range') : '24h';
+        $ownInstance = Instance::current();
+        $instances = MonitoringRecord::query()->distinct()->orderBy('instance_name')->pluck('instance_name')
+            ->push($ownInstance)->unique()->values();
+        $instance = $instances->contains(request('instance')) ? (string) request('instance') : $ownInstance;
 
         try {
-            $current = $this->current();
-            $history = $this->history(self::RANGES[$range]);
+            $current = $instance === $ownInstance ? $this->current() : $this->latest($instance);
+            $history = $this->history($instance, self::RANGES[$range]);
         } catch (Throwable) {
             $current = null;
             $history = collect();
@@ -67,12 +71,16 @@ class MonitoringComponent extends MoonShineComponent
             'range' => $range,
             'ranges' => array_keys(self::RANGES),
             'thresholds' => $thresholds,
+            'instance' => $instance,
+            'instances' => $instances,
+            'isOwnInstance' => $instance === $ownInstance,
+            'autoRefresh' => (int) config('monitoring.auto_refresh', 60),
             'recent' => $history->reverse()->take(10)->values(),
         ];
     }
 
     /**
-     * @return array{cpu: float, memory: float, disk: float, cpu_cores: ?int, memory_total_bytes: ?int, disk_total_bytes: ?int}
+     * @return array{cpu: float, memory: float, disk: float, cpu_cores: ?int, memory_total_bytes: ?int, disk_total_bytes: ?int, at: ?string}
      */
     private function current(): array
     {
@@ -87,18 +95,38 @@ class MonitoringComponent extends MoonShineComponent
             'cpu_cores' => $cpu->getCores(),
             'memory_total_bytes' => $memory->getTotalBytes(),
             'disk_total_bytes' => $disk->getTotalBytes(),
+            'at' => null,
         ];
     }
 
     /**
-     * Записи текущего инстанса за период, сжатые в корзины: память — максимум (чтобы не терять пики),
+     * Для чужого сервера «сейчас» — его последний замер.
+     *
+     * @return array{cpu: float, memory: float, disk: float, cpu_cores: ?int, memory_total_bytes: ?int, disk_total_bytes: ?int, at: ?string}|null
+     */
+    private function latest(string $instance): ?array
+    {
+        $record = MonitoringRecord::query()->where('instance_name', $instance)->latest()->first();
+
+        return $record ? [
+            'cpu' => (float) $record->cpu,
+            'memory' => (float) $record->memory,
+            'disk' => (float) $record->disk,
+            'cpu_cores' => $record->cpu_cores,
+            'memory_total_bytes' => $record->memory_total_bytes,
+            'disk_total_bytes' => $record->disk_total_bytes,
+            'at' => $record->created_at->format('d.m H:i'),
+        ] : null;
+    }
+
+    /**
+     * Записи сервера за период, сжатые в корзины: память — максимум (чтобы не терять пики),
      * CPU и диск — среднее.
      *
      * @return Collection<int, array{t: string, cpu: ?float, memory: ?float, disk: ?float, memory_total_bytes: ?int}>
      */
-    private function history(int $minutes): Collection
+    private function history(string $instance, int $minutes): Collection
     {
-        $instance = str_replace(' ', '', (string) config('monitoring.instance_name'));
         $records = MonitoringRecord::query()
             ->where('instance_name', $instance)
             ->where('created_at', '>=', now()->subMinutes($minutes))
@@ -113,20 +141,31 @@ class MonitoringComponent extends MoonShineComponent
 
         return $records
             ->groupBy(fn (MonitoringRecord $r) => intdiv($r->created_at->getTimestamp(), $bucketSeconds))
-            ->map(function (Collection $bucket) {
-                $peak = $bucket->sortByDesc('memory')->first();
-
-                return [
-                    't' => Carbon::parse($bucket->first()->created_at)->format('Y-m-d H:i'),
-                    'cpu' => $this->avg($bucket, 'cpu'),
-                    'memory' => $peak->memory !== null ? round((float) $peak->memory, 2) : null,
-                    'disk' => $this->avg($bucket, 'disk'),
-                    'memory_total_bytes' => $peak->memory_total_bytes,
-                ];
-            })
+            ->map(fn (Collection $bucket): array => $this->summarize($bucket))
             ->values();
     }
 
+    /**
+     * @param Collection<int, MonitoringRecord> $bucket
+     * @return array{t: string, cpu: ?float, memory: ?float, disk: ?float, memory_total_bytes: ?int}
+     */
+    private function summarize(Collection $bucket): array
+    {
+        $first = $bucket->firstOrFail();
+        $peak = $bucket->sortByDesc('memory')->firstOrFail();
+
+        return [
+            't' => $first->created_at->format('Y-m-d H:i'),
+            'cpu' => $this->avg($bucket, 'cpu'),
+            'memory' => $peak->memory !== null ? round($peak->memory, 2) : null,
+            'disk' => $this->avg($bucket, 'disk'),
+            'memory_total_bytes' => $peak->memory_total_bytes,
+        ];
+    }
+
+    /**
+     * @param Collection<int, MonitoringRecord> $bucket
+     */
     private function avg(Collection $bucket, string $key): ?float
     {
         $values = $bucket->pluck($key)->filter(fn ($v) => $v !== null);
@@ -134,6 +173,9 @@ class MonitoringComponent extends MoonShineComponent
         return $values->isEmpty() ? null : round((float) $values->avg(), 2);
     }
 
+    /**
+     * @param Collection<int, array{t: string, cpu: ?float, memory: ?float, disk: ?float, memory_total_bytes: ?int}> $history
+     */
     private function bytesAt(Collection $history, string $time, float $percent): ?int
     {
         $total = $history->firstWhere('t', $time)['memory_total_bytes'] ?? null;

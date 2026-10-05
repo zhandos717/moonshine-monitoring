@@ -2,43 +2,31 @@
 
 namespace Zhandos717\MoonshineMonitoring\Commands;
 
-
-use Exception;
 use Illuminate\Console\Command;
 use Zhandos717\MoonshineMonitoring\Actions\RecordUsage;
-use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
+use Zhandos717\MoonshineMonitoring\Alerts\AlertManager;
+use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
 class RecordCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'moonshine-monitoring:record';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Record resources usages';
+    protected $description = 'Record resource usage, purge old records and send alerts';
 
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     * @throws Exception
-     *
-     */
-    public function handle()
+    public function handle(RecordUsage $recorder, AlertManager $alerts): int
     {
-        app(RecordUsage::class)->record([
-            'cpu'    => Monitoring::cpu()->getUsage(),
-            'memory' => Monitoring::memory()->getUsage(),
-            'disk'   => Monitoring::disk()->getUsage(),
-        ]);
-
+        $record = $recorder->record();
         $this->info('Resource usage recorded');
+
+        $purged = MonitoringRecord::purgeOld();
+        if ($purged > 0) {
+            $this->line("Purged {$purged} old records");
+        }
+
+        foreach ($alerts->check($record->instance_name) as $metric) {
+            $this->warn("Alert sent: {$metric}");
+        }
+
+        return self::SUCCESS;
     }
 }

@@ -2,144 +2,106 @@
 
 namespace Zhandos717\MoonshineMonitoring\System;
 
-class CPU extends AbstractResource
+class CPU extends AbstractResource implements CpuResource
 {
+    // /proc/stat копит счётчики с загрузки системы, поэтому текущую загрузку даёт только разница двух замеров
+    public const SAMPLE_INTERVAL_MS = 250;
+
     protected ?int $cores = null;
 
     protected function run(): void
     {
-        if (function_exists('app') && app() && method_exists(app(), 'environment') && app()->environment() === 'testing') {
-            $this->setTotal(100);
-            $this->setUsage(50);
-            $this->cores = 4; // for testing
-            return;
-        }
+        $this->cores = $this->detectCores();
+        $usage = match ($this->os()) {
+            'Linux' => $this->linuxUsage(),
+            'Darwin' => $this->macUsage(),
+            'Windows' => $this->windowsUsage(),
+            default => null,
+        };
 
-        // Получаем количество ядер процессора
-        $this->cores = $this->getCpuCores();
-        
-        // Используем PHP для получения информации о CPU
-        $usage = $this->getCPUUsage();
-        
-        if (is_numeric($usage)) {
-            $this->setTotal(100);
-            $this->setUsage($usage);
-        } else {
-            // Set default values if we can't get CPU usage
-            $this->setTotal(0);
-            $this->setUsage(0);
-        }
+        $this->setTotal($usage === null ? 0 : 100);
+        $this->setUsage($usage ?? 0);
     }
-    
+
     public function getCores(): ?int
     {
         return $this->cores;
     }
-    
-    private function getCpuCores(): ?int
+
+    private function detectCores(): ?int
     {
-        $os = strtolower(PHP_OS);
-        
-        try {
-            if ($os === 'linux') {
-                // Подсчитываем количество ядер в /proc/cpuinfo
-                $cpuInfo = file_get_contents('/proc/cpuinfo');
-                $cores = substr_count($cpuInfo, 'processor');
-                return $cores > 0 ? $cores : null;
-            } elseif (strpos($os, 'darwin') !== false) { // macOS
-                $output = shell_exec('sysctl -n hw.ncpu 2>/dev/null');
-                if ($output) {
-                    return (int) trim($output);
-                }
-            } elseif (strpos($os, 'win') !== false) { // Windows
-                $output = getenv('NUMBER_OF_PROCESSORS');
-                if ($output) {
-                    return (int) $output;
-                }
-            }
-        } catch (\Exception $e) {
-            // В случае ошибки возвращаем null
+        $cores = match ($this->os()) {
+            'Linux' => is_readable('/proc/cpuinfo')
+                ? preg_match_all('/^processor\s*:/m', (string) file_get_contents('/proc/cpuinfo'))
+                : 0,
+            'Darwin' => (int) $this->shell('sysctl -n hw.ncpu 2>/dev/null'),
+            'Windows' => (int) getenv('NUMBER_OF_PROCESSORS'),
+            default => 0,
+        };
+
+        return $cores > 0 ? $cores : null;
+    }
+
+    private function linuxUsage(): ?float
+    {
+        $first = $this->readProcStat();
+        if ($first === null) {
             return null;
         }
-        
-        return null;
-    }
-    
-    private function getCPUUsage(): ?float
-    {
-        $os = strtolower(PHP_OS);
-        
-        try {
-            if ($os === 'linux') {
-                return $this->getLinuxCPUUsage();
-            } elseif (strpos($os, 'darwin') !== false) { // macOS
-                return $this->getMacCPUUsage();
-            } elseif (strpos($os, 'win') !== false) { // Windows
-                return $this->getWindowsCPUUsage();
-            }
-        } catch (\Exception $e) {
-            // В случае ошибки возвращаем null
-            return null;
-        }
-        
-        return null;
-    }
-    
-    private function getLinuxCPUUsage(): ?float
-    {
-        // Читаем информацию из /proc/stat
-        if (!file_exists('/proc/stat')) {
-            return null;
-        }
-        
-        $statData = file_get_contents('/proc/stat');
-        $lines = explode("\n", $statData);
-        
-        foreach ($lines as $line) {
-            if (strpos($line, 'cpu ') === 0) {
-                $parts = preg_split('/\s+/', trim($line));
-                if (count($parts) >= 5) {
-                    $user = (int) $parts[1];
-                    $nice = (int) $parts[2];
-                    $system = (int) $parts[3];
-                    $idle = (int) $parts[4];
-                    
-                    $total = $user + $nice + $system + $idle;
-                    $active = $user + $nice + $system;
-                    
-                    if ($total > 0) {
-                        return round(($active / $total) * 100, 2);
-                    }
-                }
-                break;
-            }
-        }
-        
-        return null;
-    }
-    
-    private function getMacCPUUsage(): ?float
-    {
-        // macOS не отдаёт мгновенную загрузку без внешних утилит: берём load average за минуту на ядро
-        $loads = sys_getloadavg();
-        $cores = $this->cores ?? $this->getCpuCores();
-        if ($loads === false || !$cores) {
+        usleep(self::SAMPLE_INTERVAL_MS * 1000);
+        $second = $this->readProcStat();
+        if ($second === null) {
             return null;
         }
 
-        return min(100, round($loads[0] / $cores * 100, 2));
+        $total = $second['total'] - $first['total'];
+        $idle = $second['idle'] - $first['idle'];
+
+        return $total > 0 ? round(($total - $idle) / $total * 100, 2) : null;
     }
-    
-    private function getWindowsCPUUsage(): ?float
+
+    /**
+     * @return array{total: int, idle: int}|null
+     */
+    protected function readProcStat(): ?array
     {
-        // На Windows используем wmic
-        $output = shell_exec('wmic cpu get loadpercentage /value');
-        if ($output) {
-            if (preg_match('/LoadPercentage=(\d+)/', $output, $matches)) {
-                return (float) $matches[1];
-            }
+        if (!is_readable('/proc/stat')) {
+            return null;
         }
-        
-        return null;
+        $handle = fopen('/proc/stat', 'r');
+        $line = $handle ? fgets($handle) : false;
+        if ($handle) {
+            fclose($handle);
+        }
+        if ($line === false || !str_starts_with($line, 'cpu ')) {
+            return null;
+        }
+
+        // user nice system idle iowait irq softirq steal; guest уже входит в user
+        $fields = array_map('intval', array_slice(preg_split('/\s+/', trim($line)), 1, 8));
+        if (count($fields) < 4) {
+            return null;
+        }
+
+        return ['total' => array_sum($fields), 'idle' => $fields[3] + ($fields[4] ?? 0)];
+    }
+
+    private function macUsage(): ?float
+    {
+        // macOS не отдаёт мгновенную загрузку без внешних утилит: берём load average за минуту на ядро
+        $loads = sys_getloadavg();
+        if ($loads === false || !$this->cores) {
+            return null;
+        }
+
+        return min(100, round($loads[0] / $this->cores * 100, 2));
+    }
+
+    private function windowsUsage(): ?float
+    {
+        // wmic удалён в Windows 11 24H2
+        $output = $this->powershell('(Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average');
+
+        return $output !== null && is_numeric(trim($output)) ? round((float) trim($output), 2) : null;
     }
 }

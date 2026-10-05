@@ -14,28 +14,7 @@
         $value >= $thresholds['warning'] => 'warning',
         default => 'ok',
     };
-    $statusColor = ['ok' => 'var(--msm-green)', 'warning' => 'var(--msm-orange)', 'critical' => 'var(--msm-red)'];
-    $tiles = $current ? [
-        [
-            'key' => 'cpu',
-            'value' => $current['cpu'],
-            'sub' => $current['cpu_cores'] ? $current['cpu_cores'] . ' ' . $t($current['cpu_cores'] === 1 ? 'core' : 'cores') : '',
-        ],
-        [
-            'key' => 'memory',
-            'value' => $current['memory'],
-            'sub' => $current['memory_total_bytes']
-                ? $bytes((int) ($current['memory_total_bytes'] * $current['memory'] / 100)) . ' / ' . $bytes($current['memory_total_bytes'])
-                : '',
-        ],
-        [
-            'key' => 'disk',
-            'value' => $current['disk'],
-            'sub' => $current['disk_total_bytes']
-                ? $bytes((int) ($current['disk_total_bytes'] * $current['disk'] / 100)) . ' / ' . $bytes($current['disk_total_bytes'])
-                : '',
-        ],
-    ] : [];
+    $url = static fn (array $query): string => '?' . http_build_query(array_merge(['range' => $range, 'instance' => $instance], $query));
     $chartData = [
         'points' => $history,
         'spikes' => $spikes->map(fn ($s) => ['t' => $s['peak_at'], 'value' => $s['peak']])->values(),
@@ -44,91 +23,37 @@
     ];
 @endphp
 
-<div class="msm" id="msm-root">
-    <style>
-        .msm {
-            --msm-blue: #007aff; --msm-green: #34c759; --msm-orange: #ff9f0a; --msm-red: #ff3b30;
-            --msm-muted: rgb(120 120 128 / 0.95); --msm-line: rgb(120 120 128 / 0.18);
-            --msm-track: rgb(120 120 128 / 0.16); --msm-card: rgb(120 120 128 / 0.06);
-            --msm-tip: rgb(255 255 255 / 0.96); --msm-tip-ink: #1c1c1e;
-            display: flex; flex-direction: column; gap: 1rem;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
-            font-variant-numeric: tabular-nums;
-        }
-        .dark .msm { --msm-blue: #0a84ff; --msm-green: #30d158; --msm-orange: #ff9f0a; --msm-red: #ff453a; --msm-tip: rgb(44 44 46 / 0.96); --msm-tip-ink: #f2f2f7; }
-        .msm-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
-        .msm-segmented { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--msm-track); }
-        .msm-segmented a { padding: .35rem .9rem; border-radius: 999px; font-size: .8125rem; font-weight: 500; color: var(--msm-muted); transition: background .15s, color .15s; }
-        .msm-segmented a[aria-current="page"] { background: var(--msm-tip); color: var(--msm-tip-ink); box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
-        .msm-pill { display: inline-flex; align-items: center; gap: .4rem; padding: .4rem .9rem; border-radius: 999px; font-size: .8125rem; font-weight: 500; background: var(--msm-blue); color: #fff; }
-        .msm-pill .icon-wrapper, .msm-pill svg { width: 1rem; height: 1rem; }
-        .msm-tiles { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
-        .msm-card { border-radius: 1.25rem; padding: 1.1rem 1.25rem; background: var(--msm-card); border: 1px solid var(--msm-line); min-width: 0; }
-        .msm-tile-top { display: flex; align-items: center; justify-content: space-between; font-size: .8125rem; color: var(--msm-muted); }
-        .msm-status { display: inline-flex; align-items: center; gap: .35rem; font-weight: 500; color: currentColor; }
-        .msm-tile-top .msm-status { color: inherit; }
-        .msm-status i { width: .5rem; height: .5rem; border-radius: 50%; background: var(--c); }
-        .msm-value { margin-top: .35rem; font-size: 2.25rem; line-height: 1.1; font-weight: 600; letter-spacing: -.02em; }
-        .msm-value small { font-size: 1.125rem; font-weight: 500; color: var(--msm-muted); }
-        .msm-sub { margin-top: .15rem; font-size: .8125rem; color: var(--msm-muted); min-height: 1.2em; }
-        .msm-bar { margin-top: .85rem; height: .375rem; border-radius: 999px; background: var(--msm-track); overflow: hidden; }
-        .msm-bar span { display: block; height: 100%; border-radius: 999px; background: var(--c); }
-        .msm-card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
-        .msm-card-head h3 { font-size: 1rem; font-weight: 600; }
-        .msm-legend { display: flex; flex-wrap: wrap; gap: .9rem; font-size: .75rem; color: var(--msm-muted); }
-        .msm-legend span { display: inline-flex; align-items: center; gap: .35rem; }
-        .msm-key-line { width: 14px; height: 2px; border-radius: 2px; background: var(--msm-blue); }
-        .msm-key-dash { width: 14px; border-top: 2px dashed var(--msm-orange); }
-        .msm-key-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--msm-red); }
-        .msm-chart { position: relative; }
-        .msm-chart svg { display: block; width: 100%; overflow: visible; }
-        .msm-chart .grid line { stroke: var(--msm-line); }
-        .msm-chart text { fill: var(--msm-muted); font-size: 11px; }
-        .msm-tip { position: absolute; z-index: 5; pointer-events: none; padding: .45rem .65rem; border-radius: .75rem; font-size: .75rem; line-height: 1.35;
-            background: var(--msm-tip); color: var(--msm-tip-ink); box-shadow: 0 6px 20px rgb(0 0 0 / .18); backdrop-filter: blur(12px); white-space: nowrap; transform: translate(-50%, calc(-100% - 12px)); }
-        .msm-tip b { font-size: .875rem; }
-        .msm-pair { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
-        .msm-scroll { overflow-x: auto; }
-        .msm-table { width: 100%; font-size: .8125rem; border-collapse: collapse; }
-        .msm-table th { text-align: left; font-weight: 500; color: var(--msm-muted); padding: .4rem .5rem; border-bottom: 1px solid var(--msm-line); white-space: nowrap; }
-        .msm-table td { padding: .55rem .5rem; border-bottom: 1px solid var(--msm-line); white-space: nowrap; }
-        .msm-table tr:last-child td { border-bottom: 0; }
-        .msm-table .num { text-align: right; }
-        .msm-hint { font-size: .75rem; color: var(--msm-muted); }
-        .msm-empty { padding: 2rem 1rem; text-align: center; color: var(--msm-muted); }
-        .msm-empty code { display: inline-block; margin-top: .5rem; padding: .35rem .6rem; border-radius: .5rem; background: var(--msm-track); }
-    </style>
+<div class="msm" id="msm-root" data-auto-refresh="{{ $autoRefresh }}">
+    @include('moonshine-monitoring::partials.styles')
 
     <div class="msm-head">
         <nav class="msm-segmented" aria-label="{{ $t('timestamp') }}">
             @foreach($ranges as $item)
-                <a href="?range={{ $item }}" @if($item === $range) aria-current="page" @endif>{{ $t('range_' . $item) }}</a>
+                <a href="{{ $url(['range' => $item]) }}" @if($item === $range) aria-current="page" @endif>{{ $t('range_' . $item) }}</a>
             @endforeach
         </nav>
-        <a href="?range={{ $range }}" class="msm-pill">
-            <x-moonshine::icon icon="arrow-path" path="moonshine::icons" />
-            {{ $t('refresh') }}
-        </a>
+        <div class="msm-controls">
+            @if($instances->count() > 1)
+                <select class="msm-select" aria-label="{{ $t('server') }}" data-msm-instance>
+                    @foreach($instances as $item)
+                        <option value="{{ $url(['instance' => $item]) }}" @selected($item === $instance)>{{ $item }}</option>
+                    @endforeach
+                </select>
+            @endif
+            @if($autoRefresh > 0)
+                <label class="msm-toggle" title="{{ $t('updated', ['time' => now()->format('H:i:s')]) }}">
+                    <input type="checkbox" data-msm-auto>
+                    {{ $t('auto_refresh') }}
+                </label>
+            @endif
+            <a href="{{ $url([]) }}" class="msm-pill">
+                <x-moonshine::icon icon="arrow-path" path="moonshine::icons" />
+                {{ $t('refresh') }}
+            </a>
+        </div>
     </div>
 
-    @if($tiles)
-        <div class="msm-tiles">
-            @foreach($tiles as $tile)
-                @php
-                    $state = $status($tile['value']);
-                @endphp
-                <div class="msm-card" style="--c: {{ $statusColor[$state] }}">
-                    <div class="msm-tile-top">
-                        <span>{{ $t($tile['key']) }} · {{ $t('now') }}</span>
-                        <span class="msm-status"><i></i>{{ $t('status_' . $state) }}</span>
-                    </div>
-                    <div class="msm-value">{{ number_format($tile['value'], 1) }}<small>%</small></div>
-                    <div class="msm-sub">{{ $tile['sub'] }}</div>
-                    <div class="msm-bar"><span style="width: {{ min(100, max(0, $tile['value'])) }}%"></span></div>
-                </div>
-            @endforeach
-        </div>
-    @endif
+    @include('moonshine-monitoring::partials.tiles')
 
     @if($history->isEmpty())
         <div class="msm-card msm-empty">
@@ -230,10 +155,32 @@
     @endif
 
     <script type="application/json" id="msm-data">@json($chartData)</script>
+    @once
     <script>
-        (() => {
-            const root = document.getElementById('msm-root');
-            const data = JSON.parse(document.getElementById('msm-data').textContent);
+        window.msmInit = (root) => {
+            const auto = root.querySelector('[data-msm-auto]');
+            const schedule = () => {
+                if (!auto) return;
+                clearTimeout(window.msmTimer);
+                window.msmTimer = setTimeout(async () => {
+                    if (!document.contains(root)) return;
+                    if (auto.checked && !document.hidden) {
+                        try {
+                            const html = await (await fetch(window.location.href, { headers: { Accept: 'text/html' } })).text();
+                            const fresh = new DOMParser().parseFromString(html, 'text/html').getElementById('msm-root');
+                            if (fresh) {
+                                root.replaceWith(fresh);
+                                window.msmInit(fresh);
+                                return;
+                            }
+                        } catch (e) {}
+                    }
+                    schedule();
+                }, (+root.dataset.autoRefresh || 60) * 1000);
+            };
+            if (root.dataset.ready) return;
+            root.dataset.ready = '1';
+            const data = JSON.parse(root.querySelector('#msm-data').textContent);
             const NS = 'http://www.w3.org/2000/svg';
             const el = (name, attrs = {}) => {
                 const node = document.createElementNS(NS, name);
@@ -349,6 +296,20 @@
                 lastWidth = root.clientWidth;
                 charts.forEach(draw);
             }).observe(root);
-        })();
+
+            root.querySelector('[data-msm-instance]')?.addEventListener('change', (event) => {
+                window.location.search = event.target.value;
+            });
+
+            if (auto) {
+                try { auto.checked = localStorage.getItem('msm-auto-refresh') !== '0'; } catch (e) { auto.checked = true; }
+                auto.addEventListener('change', () => {
+                    try { localStorage.setItem('msm-auto-refresh', auto.checked ? '1' : '0'); } catch (e) {}
+                });
+            }
+            schedule();
+        };
     </script>
+    @endonce
+    <script>window.msmInit(document.currentScript.closest('.msm'));</script>
 </div>

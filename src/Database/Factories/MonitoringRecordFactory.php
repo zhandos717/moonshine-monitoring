@@ -5,11 +5,14 @@ namespace Zhandos717\MoonshineMonitoring\Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 
+/**
+ * @extends Factory<MonitoringRecord>
+ */
 class MonitoringRecordFactory extends Factory
 {
     protected $model = MonitoringRecord::class;
 
-    public function definition()
+    public function definition(): array
     {
         return [
             'instance_name' => $this->faker->word,

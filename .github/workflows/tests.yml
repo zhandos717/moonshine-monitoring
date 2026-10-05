@@ -24,3 +24,4 @@ jobs:
       - run: composer require "moonshine/moonshine:${{ matrix.moonshine }}" --no-update
       - run: composer update --prefer-dist --no-progress -W
       - run: vendor/bin/phpunit
+      - run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G

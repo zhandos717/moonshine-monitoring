@@ -47,6 +47,11 @@ Moonshine Monitoring is a Laravel package that provides system resource monitori
 - Supports MoonShine 3.x and 4.x
 - Memory spike detection: spikes are marked on the chart and listed with peak, duration and rise over the usual level
 - Time ranges: 1 hour, 24 hours, 7 days
+- Several servers: switch between instances that write to the same database
+- Auto refresh without page reload
+- Alerts by email and Telegram when CPU, memory or disk stay above a threshold
+- Dashboard widget for the MoonShine home page
+- Old records are purged automatically
 - Light and dark MoonShine themes
 - Enhanced dashboard with progress bars and real-time updates
 - Multi-language support (English and Russian)
@@ -110,7 +115,49 @@ After publishing the configuration file, you can modify the settings in `config/
 - `thresholds.warning` / `thresholds.critical`: status of the usage tiles, the threshold line on the memory chart (default 85 / 95)
 - `memory_spikes.min_rise`: how many percentage points above the usual level counts as a spike (default 8)
 - `memory_spikes.window`: number of recent calm samples the usual level is calculated from (default 15)
-- `purge_before`: retention period for old records (not applied automatically yet)
+- `purge_before`: records older than this are deleted by `moonshine-monitoring:record` (default `-30 days`, `null` keeps everything)
+- `disk_path`: partition shown as «Disk» (default `/`)
+- `alerts`: notifications, see below
+- `auto_refresh`: dashboard refresh interval in seconds, `0` disables it (default 60)
+
+## Alerts
+
+An alert is sent when a metric stays above its threshold for `alerts.minutes` minutes in a row (5 by default). The same metric is not reported again for `alerts.cooldown` minutes. Alerts are checked by `moonshine-monitoring:record`, so the command must be scheduled.
+
+```dotenv
+MONITORING_ALERTS=true
+MONITORING_ALERT_MAIL=ops@example.com
+MONITORING_TELEGRAM_BOT_TOKEN=123456:ABC...
+MONITORING_TELEGRAM_CHAT_ID=-1001234567890
+```
+
+Email uses your Laravel mail settings. Telegram needs no extra packages.
+
+## Dashboard widget
+
+![Dashboard widget](docs/dashboard-widget.png)
+
+```php
+use Zhandos717\MoonshineMonitoring\Components\MonitoringWidget;
+
+// app/MoonShine/Pages/Dashboard.php
+protected function components(): iterable
+{
+    return [
+        MonitoringWidget::make(),
+    ];
+}
+```
+
+## Testing your application
+
+Replace real measurements in your own tests:
+
+```php
+use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
+
+Monitoring::fake(cpu: 40, memory: 92, disk: 70);
+```
 
 ## Dashboard Features
 

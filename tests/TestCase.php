@@ -34,7 +34,7 @@ class TestCase extends OrchestraTestCase
                 'telegram' => ''
             ],
             'migrations' => true,
-            'purge_before' => '-1 day',
+            'purge_before' => '-30 days',
         ]);
 
         $app['config']->set('app.key', 'base64:' . base64_encode(str_repeat('a', 32)));

@@ -2,11 +2,8 @@
 
 namespace Zhandos717\MoonshineMonitoring\System;
 
-use Illuminate\Support\Str;
-
 abstract class AbstractResource implements SystemResource
 {
-
     protected ?int $total = null;
     protected ?float $usage = null;
 
@@ -15,9 +12,11 @@ abstract class AbstractResource implements SystemResource
         $this->run();
     }
 
-    protected function getOS(): string
+    abstract protected function run(): void;
+
+    protected function os(): string
     {
-        return strtolower(PHP_OS);
+        return PHP_OS_FAMILY;
     }
 
     public function setUsage(?float $usage): SystemResource
@@ -34,7 +33,6 @@ abstract class AbstractResource implements SystemResource
         return $this;
     }
 
-
     public function getUsage(): ?float
     {
         return $this->usage ?? 0;
@@ -45,14 +43,18 @@ abstract class AbstractResource implements SystemResource
         return $this->total ?? 0;
     }
 
-    protected function run(): void
+    protected function shell(string $command): ?string
     {
-        if (function_exists('app') && app() && method_exists(app(), 'environment') && app()->environment() === 'testing') {
-            $this->setTotal(100);
-            $this->setUsage(50);
+        if (!function_exists('shell_exec')) {
+            return null;
         }
-        
-        // Каждый конкретный ресурс должен реализовать свою логику в run()
-        // Этот метод остается для обратной совместимости
+        $output = @shell_exec($command);
+
+        return is_string($output) && trim($output) !== '' ? $output : null;
+    }
+
+    protected function powershell(string $script): ?string
+    {
+        return $this->shell('powershell -NoProfile -NonInteractive -Command "' . str_replace('"', '\"', $script) . '"');
     }
 }

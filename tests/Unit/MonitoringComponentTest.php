@@ -4,6 +4,8 @@ namespace Zhandos717\MoonshineMonitoring\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use Zhandos717\MoonshineMonitoring\Components\MonitoringComponent;
+use Zhandos717\MoonshineMonitoring\Components\MonitoringWidget;
+use Zhandos717\MoonshineMonitoring\Facades\Monitoring;
 use Zhandos717\MoonshineMonitoring\Models\MonitoringRecord;
 use Zhandos717\MoonshineMonitoring\Tests\TestCase;
 
@@ -79,5 +81,44 @@ class MonitoringComponentTest extends TestCase
         request()->merge(['range' => 'year']);
 
         $this->assertSame('24h', (new MonitoringComponent('Test'))->viewData()['range']);
+    }
+
+    #[Test]
+    public function it_switches_to_another_server_and_shows_its_last_sample()
+    {
+        Monitoring::fake(memory: 10);
+        MonitoringRecord::factory()->create(['instance_name' => 'test-instance', 'memory' => 40, 'created_at' => now()->subMinute()]);
+        MonitoringRecord::factory()->create(['instance_name' => 'worker-2', 'memory' => 77, 'created_at' => now()->subMinute()]);
+
+        request()->merge(['instance' => 'worker-2']);
+        $data = (new MonitoringComponent('Test'))->viewData();
+
+        $this->assertSame('worker-2', $data['instance']);
+        $this->assertFalse($data['isOwnInstance']);
+        $this->assertSame(77.0, $data['current']['memory']);
+        $this->assertSame(['test-instance', 'worker-2'], $data['instances']->all());
+    }
+
+    #[Test]
+    public function unknown_server_falls_back_to_own()
+    {
+        Monitoring::fake(memory: 10);
+        request()->merge(['instance' => 'nope']);
+
+        $data = (new MonitoringComponent('Test'))->viewData();
+
+        $this->assertSame('test-instance', $data['instance']);
+        $this->assertSame(10.0, $data['current']['memory']);
+    }
+
+    #[Test]
+    public function widget_renders_tiles()
+    {
+        Monitoring::fake(cpu: 12, memory: 96);
+
+        $html = (string) MonitoringWidget::make()->render();
+
+        $this->assertStringContainsString('msm-tiles', $html);
+        $this->assertStringContainsString('96.0', $html);
     }
 }
